@@ -10,6 +10,7 @@ import (
 
 	qrterminal "github.com/mdp/qrterminal/v3"
 
+	"github.com/calling-parents/calling-parents/internal/auth"
 	"github.com/calling-parents/calling-parents/internal/children"
 	"github.com/calling-parents/calling-parents/internal/config"
 	"github.com/calling-parents/calling-parents/internal/network"
@@ -22,7 +23,18 @@ var webFS embed.FS
 func main() {
 	cfg := config.Load()
 
-	lanURL := network.LanURL(cfg.ListenAddr)
+	// Resolve auth token: use env var or generate a random one.
+	token := cfg.AuthToken
+	if token == "" {
+		var err error
+		token, err = auth.GenerateToken()
+		if err != nil {
+			log.Fatalf("failed to generate auth token: %v", err)
+		}
+		log.Println("Generated random auth token (set AUTH_TOKEN env to use a fixed one)")
+	}
+
+	lanURL := network.LanURL(cfg.ListenAddr) + "#token=" + token
 
 	log.Printf("ProPresenter API: %s", cfg.ProPresenterURL())
 	log.Printf("Listening on %s", cfg.ListenAddr)
@@ -63,7 +75,11 @@ func main() {
 	}
 	mux.Handle("/", http.FileServer(http.FS(webContent)))
 
-	if err := http.ListenAndServe(cfg.ListenAddr, mux); err != nil {
+	// Wrap mux with auth middleware: protect /api/ and /children.
+	protectedPrefixes := []string{"/api/", "/children"}
+	handler := auth.Middleware(token, protectedPrefixes)(mux)
+
+	if err := http.ListenAndServe(cfg.ListenAddr, handler); err != nil {
 		log.Fatalf("server error: %v", err)
 	}
 }

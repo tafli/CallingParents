@@ -14,6 +14,7 @@ All architecture decisions are recorded as ADRs in `docs/architecture/`. **Alway
 | [004](docs/architecture/004-data-management.md) | Data Management — Browser localStorage |
 | [005](docs/architecture/005-deployment.md) | Deployment — Go Binary with Embedded PWA |
 | [006](docs/architecture/006-cors-api-proxy.md) | CORS Handling — Go Reverse Proxy |
+| [007](docs/architecture/007-authentication.md) | Authentication — Bearer Token via QR Code |
 
 ---
 

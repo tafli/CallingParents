@@ -11,6 +11,7 @@ func TestLoadDefaults(t *testing.T) {
 	os.Unsetenv("PROPRESENTER_PORT")
 	os.Unsetenv("LISTEN_ADDR")
 	os.Unsetenv("CHILDREN_FILE")
+	os.Unsetenv("AUTH_TOKEN")
 
 	cfg := Load()
 
@@ -26,16 +27,21 @@ func TestLoadDefaults(t *testing.T) {
 	if cfg.ChildrenFile != "children.json" {
 		t.Errorf("expected ChildrenFile=children.json, got %s", cfg.ChildrenFile)
 	}
+	if cfg.AuthToken != "" {
+		t.Errorf("expected AuthToken=empty, got %s", cfg.AuthToken)
+	}
 }
 
 func TestLoadFromEnv(t *testing.T) {
 	os.Setenv("PROPRESENTER_HOST", "192.168.1.100")
 	os.Setenv("PROPRESENTER_PORT", "9999")
 	os.Setenv("LISTEN_ADDR", ":3000")
+	os.Setenv("AUTH_TOKEN", "my-secret-token")
 	defer func() {
 		os.Unsetenv("PROPRESENTER_HOST")
 		os.Unsetenv("PROPRESENTER_PORT")
 		os.Unsetenv("LISTEN_ADDR")
+		os.Unsetenv("AUTH_TOKEN")
 	}()
 
 	cfg := Load()
@@ -48,6 +54,9 @@ func TestLoadFromEnv(t *testing.T) {
 	}
 	if cfg.ListenAddr != ":3000" {
 		t.Errorf("expected ListenAddr=:3000, got %s", cfg.ListenAddr)
+	}
+	if cfg.AuthToken != "my-secret-token" {
+		t.Errorf("expected AuthToken=my-secret-token, got %s", cfg.AuthToken)
 	}
 }
 

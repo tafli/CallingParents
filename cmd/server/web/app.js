@@ -1,11 +1,36 @@
 // === Storage Keys ===
 const STORAGE_CHILDREN = "calling_parents_children";
 const STORAGE_SETTINGS = "calling_parents_settings";
+const STORAGE_TOKEN = "calling_parents_token";
 
 // === State ===
 let children = [];
 let settings = { messageId: "Eltern rufen" };
 let activeMessage = false;
+let authToken = "";
+
+// === Auth Token ===
+// Extract token from URL hash fragment (#token=...) and persist in localStorage.
+function initToken() {
+    const hash = window.location.hash;
+    if (hash.startsWith("#token=")) {
+        authToken = hash.substring(7);
+        localStorage.setItem(STORAGE_TOKEN, authToken);
+        // Remove token from URL bar so it's not visible/shared accidentally.
+        history.replaceState(null, "", window.location.pathname);
+    } else {
+        authToken = localStorage.getItem(STORAGE_TOKEN) || "";
+    }
+}
+
+// Build headers object with auth token included.
+function authHeaders(extra = {}) {
+    const headers = { ...extra };
+    if (authToken) {
+        headers["Authorization"] = "Bearer " + authToken;
+    }
+    return headers;
+}
 
 // === DOM Elements ===
 const viewMain = document.getElementById("view-main");
@@ -28,6 +53,7 @@ const headerTitle = document.getElementById("header-title");
 
 // === Initialization ===
 function init() {
+    initToken();
     loadData();
     renderChildrenGrid();
     renderChildrenList();
@@ -84,7 +110,9 @@ function saveSettings() {
 // === Server Children Sync ===
 async function fetchServerChildren() {
     try {
-        const resp = await fetch("/children");
+        const resp = await fetch("/children", {
+            headers: authHeaders(),
+        });
         if (!resp.ok) return;
 
         const serverNames = await resp.json();
@@ -195,7 +223,7 @@ function addChild() {
     // Persist to server-side children file (fire-and-forget).
     fetch("/children", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({ name }),
     }).catch(() => {
         // Server sync is best-effort; localStorage is the primary store.
@@ -219,7 +247,7 @@ async function sendMessage() {
         const messageId = encodeURIComponent(settings.messageId);
         const resp = await fetch(`/api/v1/message/${messageId}/trigger`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: authHeaders({ "Content-Type": "application/json" }),
             body: JSON.stringify([
                 {
                     name: "Name",
@@ -246,7 +274,9 @@ async function sendMessage() {
 async function clearMessage() {
     try {
         const messageId = encodeURIComponent(settings.messageId);
-        const resp = await fetch(`/api/v1/message/${messageId}/clear`);
+        const resp = await fetch(`/api/v1/message/${messageId}/clear`, {
+            headers: authHeaders(),
+        });
 
         if (!resp.ok && resp.status !== 204) {
             throw new Error(`HTTP ${resp.status}`);
@@ -269,7 +299,9 @@ async function testConnection() {
     connectionStatus.className = "connection-status";
 
     try {
-        const resp = await fetch("/api/v1/messages");
+        const resp = await fetch("/api/v1/messages", {
+            headers: authHeaders(),
+        });
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 
         const data = await resp.json();
