@@ -18,6 +18,7 @@ When a child in the nursery or kids' area needs their parents, tap their name an
 - **Live connection status** — real-time indicator shows whether ProPresenter is reachable
 - **Multi-language support** — German and English included, easily extensible (just add a JSON file)
 - **Single binary deployment** — one self-contained executable embeds everything, no dependencies to install
+- **Auto-upgrading config** — new configuration options are automatically appended to existing `config.toml` files on startup (with a `.bak` backup), so upgrades never break your setup
 - **Cross-platform server** — pre-built for Linux and Windows (runs on the ProPresenter machine or any PC on the network)
 - **Bearer token authentication** — simple but effective, prevents unauthorized access on the local network
 - **Activity logging** — optional JSONL log of all send/clear events with timestamps
@@ -71,7 +72,7 @@ Produces binaries in `dist/`:
 
 ### 2. Configure
 
-On first run, if no `config.toml` exists, one is created automatically with default values. Edit it to customize:
+On first run, if no `config.toml` exists, one is created automatically with default values. On subsequent updates, any **new configuration keys** are automatically appended to your existing file (a `config.toml.bak` backup is created first) — your customized values are never overwritten. Edit it to customize:
 
 ```bash
 # Or copy the example manually:
@@ -154,7 +155,7 @@ cmd/server/
 internal/
   auth/                — Bearer token validation middleware
   children/            — Children names file I/O and HTTP handlers
-  config/              — Configuration from environment variables
+  config/              — TOML configuration loading with auto-merge
   message/             — ProPresenter message send/clear/test handlers
   network/             — LAN IP detection for QR code URL
   activitylog/         — Append-only JSONL activity logger

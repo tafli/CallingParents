@@ -68,6 +68,8 @@ All configuration is via a `config.toml` file (TOML format), with optional envir
 
 A `config.toml.example` file is provided as a reference. If no `config.toml` exists when the server starts, a default one is created automatically with sensible defaults and comments — no manual copying needed.
 
+When the application is updated with new configuration options, existing `config.toml` files are **automatically upgraded**: on startup, the server detects missing keys and appends them (with comments and defaults) to the end of the file. Before modifying the file, a backup is saved as `config.toml.bak`. Keys that the user has already set (or that exist as commented-out entries) are never overwritten. The default config content is generated from a single source of truth (`allConfigBlocks` in `config.go`), ensuring the auto-created file and the merge logic always stay in sync.
+
 ### Deployment Steps (Windows)
 
 1. On the development machine, run `./build.sh` to produce both binaries.
