@@ -21,9 +21,12 @@ func clearEnv(t *testing.T) {
 func TestLoadDefaults(t *testing.T) {
 	clearEnv(t)
 
-	cfg, err := Load("")
+	cfg, created, err := Load("")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	}
+	if created {
+		t.Error("expected created=false for empty path")
 	}
 
 	if cfg.ProPresenterHost != "localhost" {
@@ -71,9 +74,12 @@ activity_log = "log.jsonl"
 		t.Fatalf("failed to write test config: %v", err)
 	}
 
-	cfg, err := Load(path)
+	cfg, created, err := Load(path)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	}
+	if created {
+		t.Error("expected created=false for existing file")
 	}
 
 	if cfg.ProPresenterHost != "192.168.1.50" {
@@ -118,7 +124,7 @@ auto_clear_seconds = 10
 	t.Setenv("PROPRESENTER_HOST", "10.0.0.1")
 	t.Setenv("AUTO_CLEAR_SECONDS", "120")
 
-	cfg, err := Load(path)
+	cfg, _, err := Load(path)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -139,14 +145,25 @@ auto_clear_seconds = 10
 func TestLoadMissingFile(t *testing.T) {
 	clearEnv(t)
 
-	cfg, err := Load("/nonexistent/config.toml")
+	dir := t.TempDir()
+	path := filepath.Join(dir, "config.toml")
+
+	cfg, created, err := Load(path)
 	if err != nil {
 		t.Fatalf("unexpected error for missing file: %v", err)
 	}
+	if !created {
+		t.Error("expected created=true when file did not exist")
+	}
 
-	// Should fall back to defaults
+	// Should use defaults
 	if cfg.ProPresenterHost != "localhost" {
 		t.Errorf("expected default ProPresenterHost=localhost, got %s", cfg.ProPresenterHost)
+	}
+
+	// File should exist on disk now
+	if _, err := os.Stat(path); err != nil {
+		t.Errorf("expected config file to be created at %s: %v", path, err)
 	}
 }
 
@@ -159,7 +176,7 @@ func TestLoadInvalidTOML(t *testing.T) {
 		t.Fatalf("failed to write test config: %v", err)
 	}
 
-	_, err := Load(path)
+	_, _, err := Load(path)
 	if err == nil {
 		t.Error("expected error for invalid TOML, got nil")
 	}
@@ -188,7 +205,7 @@ propresenter_host = "10.0.0.5"
 		t.Fatalf("failed to write test config: %v", err)
 	}
 
-	cfg, err := Load(path)
+	cfg, _, err := Load(path)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

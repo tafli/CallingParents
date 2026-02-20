@@ -31,9 +31,12 @@ func main() {
 		configPath = os.Args[1]
 	}
 
-	cfg, err := config.Load(configPath)
+	cfg, created, err := config.Load(configPath)
 	if err != nil {
 		log.Fatalf("failed to load config: %v", err)
+	}
+	if created {
+		log.Printf("Created default config file: %s (edit it to customize settings)", configPath)
 	}
 
 	// Resolve auth token: use env var or generate a random one.

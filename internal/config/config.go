@@ -8,6 +8,38 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+// defaultConfigContent is written to disk when no config file exists.
+const defaultConfigContent = `# Calling Parents — Configuration
+
+# Hostname or IP of the ProPresenter machine.
+propresenter_host = "localhost"
+
+# ProPresenter API port (default in ProPresenter: 50001).
+propresenter_port = "50001"
+
+# Address and port this server listens on.
+listen_addr = ":8080"
+
+# Path to the JSON file with children's names (see children.json.example).
+children_file = "children.json"
+
+# ProPresenter message template name (must match the message name in ProPresenter).
+message_name = "Eltern rufen"
+
+# Seconds after which a displayed message is automatically cleared.
+# Set to 0 to disable auto-clear.
+auto_clear_seconds = 30
+
+# Path to activity log file (JSONL format, append-only).
+# Records send/clear events with timestamps. Leave empty to disable.
+# activity_log = "activity.jsonl"
+
+# Bearer token for API authentication.
+# If not set, a random token is generated on each startup (printed in QR code).
+# Set this for a stable token that survives restarts.
+# auth_token = ""
+`
+
 // Config holds the application configuration.
 type Config struct {
 	// ProPresenterHost is the hostname or IP of the ProPresenter machine.
@@ -32,14 +64,22 @@ type Config struct {
 }
 
 // Load reads configuration from a TOML file, then applies environment variable
-// overrides. If the file does not exist, defaults are used.
-func Load(path string) (Config, error) {
+// overrides. If the file does not exist, a default config file is created.
+// The returned bool indicates whether a new config file was created.
+func Load(path string) (Config, bool, error) {
 	cfg := defaults()
+	created := false
 
 	if path != "" {
-		if _, err := os.Stat(path); err == nil {
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			// Write a default config file so the user has something to edit.
+			if writeErr := os.WriteFile(path, []byte(defaultConfigContent), 0644); writeErr != nil {
+				return Config{}, false, fmt.Errorf("creating default config %s: %w", path, writeErr)
+			}
+			created = true
+		} else if err == nil {
 			if _, err := toml.DecodeFile(path, &cfg); err != nil {
-				return Config{}, fmt.Errorf("reading config %s: %w", path, err)
+				return Config{}, false, fmt.Errorf("reading config %s: %w", path, err)
 			}
 		}
 	}
@@ -47,7 +87,7 @@ func Load(path string) (Config, error) {
 	// Environment variables override TOML values.
 	applyEnvOverrides(&cfg)
 
-	return cfg, nil
+	return cfg, created, nil
 }
 
 // defaults returns a Config with sensible default values.

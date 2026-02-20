@@ -71,7 +71,10 @@ Produces binaries in `dist/`:
 
 ### 2. Configure
 
+On first run, if no `config.toml` exists, one is created automatically with default values. Edit it to customize:
+
 ```bash
+# Or copy the example manually:
 cp config.toml.example config.toml
 ```
 
@@ -112,7 +115,7 @@ Names can also be managed in the PWA's settings view and are synced bidirectiona
 ```
 
 **Windows (ProPresenter machine):**
-1. Place the `.exe`, `config.toml`, `children.json`, and `run.bat` in a folder
+1. Place the `.exe`, `children.json`, and `run.bat` in a folder (a `config.toml` is created on first run)
 2. Double-click `run.bat`
 
 The server prints a QR code in the terminal — scan it with the phone's camera to open and authenticate the PWA in one step.

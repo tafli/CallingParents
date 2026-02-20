@@ -66,7 +66,7 @@ All configuration is via a `config.toml` file (TOML format), with optional envir
 | `PROPRESENTER_PORT` | `propresenter_port` | `50001` | ProPresenter API port |
 | `LISTEN_ADDR` | `listen_addr` | `:8080` | Address and port the server listens on |
 
-A `config.toml.example` file is provided. Copy it to `config.toml` and adjust values.
+A `config.toml.example` file is provided as a reference. If no `config.toml` exists when the server starts, a default one is created automatically with sensible defaults and comments — no manual copying needed.
 
 ### Deployment Steps (Windows)
 
