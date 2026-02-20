@@ -1,5 +1,10 @@
 # Calling Parents — Church Child Care Parent Notification via ProPresenter
 
+[![GitHub release](https://img.shields.io/github/v/release/tafli/CallingParents)](https://github.com/tafli/CallingParents/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/tafli/CallingParents/blob/main/LICENSE)
+[![CI](https://github.com/tafli/CallingParents/actions/workflows/ci.yml/badge.svg)](https://github.com/tafli/CallingParents/actions/workflows/ci.yml)
+[![Release](https://github.com/tafli/CallingParents/actions/workflows/release.yml/badge.svg)](https://github.com/tafli/CallingParents/actions/workflows/release.yml)
+
 > **Notify parents on the big screen.** A lightweight app for church child care teams to instantly display parent call messages on ProPresenter audience screens — from any phone, no app store needed.
 
 When a child in the nursery or kids' area needs their parents, tap their name and a message like **"Parents of Paul"** appears on the main projector or TV in the worship hall — powered by [ProPresenter](https://renewedvision.com/propresenter/)'s Messages API.
