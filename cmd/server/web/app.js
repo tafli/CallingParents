@@ -67,6 +67,9 @@ function init() {
     // Fetch server config (auto-clear timer)
     fetchConfig();
 
+    // Fetch and display version info
+    fetchVersion();
+
     // Start connection status polling
     checkConnection();
     setInterval(checkConnection, 30000);
@@ -477,6 +480,22 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch((err) => {
         console.warn("Service worker registration failed:", err);
     });
+}
+
+// === Version Info ===
+async function fetchVersion() {
+    try {
+        const resp = await fetch("/version");
+        if (!resp.ok) return;
+        const info = await resp.json();
+        const el = document.getElementById("version-info");
+        if (el && info.version) {
+            el.textContent = info.version;
+            el.title = `${info.version} (${info.commit}) ${info.date}`;
+        }
+    } catch (_) {
+        // Version display is non-critical
+    }
 }
 
 // === Start ===

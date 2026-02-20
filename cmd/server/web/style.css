@@ -372,6 +372,14 @@ header h1 {
     padding-bottom: 24px;
 }
 
+/* Version footer in settings */
+.version-footer {
+    text-align: center;
+    padding: 16px 0 0;
+    color: var(--color-text-light);
+    font-size: 0.8rem;
+}
+
 /* Empty state */
 .children-grid:empty::after {
     content: "Keine Kinder eingetragen. Öffne die Einstellungen (⚙), um Namen hinzuzufügen.";

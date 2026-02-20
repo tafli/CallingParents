@@ -16,12 +16,15 @@ import (
 	"github.com/calling-parents/calling-parents/internal/config"
 	"github.com/calling-parents/calling-parents/internal/message"
 	"github.com/calling-parents/calling-parents/internal/network"
+	"github.com/calling-parents/calling-parents/internal/version"
 )
 
 //go:embed all:web
 var webFS embed.FS
 
 func main() {
+	log.Printf("calling-parents %s", version.Info())
+
 	cfg := config.Load()
 
 	// Resolve auth token: use env var or generate a random one.
@@ -79,6 +82,9 @@ func main() {
 	log.Printf("Loaded %d children from %s", len(childStore.Names()), cfg.ChildrenFile)
 
 	mux := http.NewServeMux()
+
+	// Version endpoint (no auth required)
+	mux.HandleFunc("/version", version.HandleVersion())
 
 	// Children endpoint
 	mux.Handle("/children", childStore)

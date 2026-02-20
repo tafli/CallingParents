@@ -3,6 +3,18 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
+# Version info from Git
+VERSION="${VERSION:-$(git describe --tags --always --dirty 2>/dev/null || echo "dev")}"
+COMMIT="${COMMIT:-$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")}"
+DATE="${DATE:-$(date -u +%Y-%m-%dT%H:%M:%SZ)}"
+
+LDFLAGS="-X github.com/calling-parents/calling-parents/internal/version.Version=${VERSION}"
+LDFLAGS+=" -X github.com/calling-parents/calling-parents/internal/version.Commit=${COMMIT}"
+LDFLAGS+=" -X github.com/calling-parents/calling-parents/internal/version.Date=${DATE}"
+
+echo "==> Version: ${VERSION} (${COMMIT}) ${DATE}"
+echo ""
+
 echo "==> Formatting..."
 gofmt -w .
 
@@ -13,10 +25,10 @@ echo "==> Testing..."
 go test ./...
 
 echo "==> Building linux/amd64..."
-GOOS=linux GOARCH=amd64 go build -o dist/calling_parents-linux-amd64 ./cmd/server
+GOOS=linux GOARCH=amd64 go build -ldflags "${LDFLAGS}" -o dist/calling_parents-linux-amd64 ./cmd/server
 
 echo "==> Building windows/amd64..."
-GOOS=windows GOARCH=amd64 go build -o dist/calling_parents-windows-amd64.exe ./cmd/server
+GOOS=windows GOARCH=amd64 go build -ldflags "${LDFLAGS}" -o dist/calling_parents-windows-amd64.exe ./cmd/server
 
 echo ""
 echo "==> Build complete:"
