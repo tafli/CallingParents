@@ -1,11 +1,9 @@
 // === Storage Keys ===
 const STORAGE_CHILDREN = "calling_parents_children";
-const STORAGE_SETTINGS = "calling_parents_settings";
 const STORAGE_TOKEN = "calling_parents_token";
 
 // === State ===
 let children = [];
-let settings = { messageId: "Eltern rufen" };
 let activeMessage = false;
 let authToken = "";
 
@@ -42,7 +40,6 @@ const inputName = document.getElementById("input-name");
 const btnSend = document.getElementById("btn-send");
 const btnClear = document.getElementById("btn-clear");
 const statusBar = document.getElementById("status-bar");
-const settingMessageId = document.getElementById("setting-message-id");
 const btnTestConnection = document.getElementById("btn-test-connection");
 const connectionStatus = document.getElementById("connection-status");
 const inputAddChild = document.getElementById("input-add-child");
@@ -58,7 +55,6 @@ function init() {
     loadData();
     renderChildrenGrid();
     renderChildrenList();
-    settingMessageId.value = settings.messageId;
 
     // Fetch server-side children list, then merge
     fetchServerChildren();
@@ -78,10 +74,6 @@ function init() {
     inputAddChild.addEventListener("keydown", (e) => {
         if (e.key === "Enter") addChild();
     });
-    settingMessageId.addEventListener("change", () => {
-        settings.messageId = settingMessageId.value.trim() || "Eltern rufen";
-        saveSettings();
-    });
 }
 
 // === Data Persistence ===
@@ -92,21 +84,11 @@ function loadData() {
     } catch (_) {
         children = [];
     }
-    try {
-        const storedSettings = localStorage.getItem(STORAGE_SETTINGS);
-        if (storedSettings) settings = { ...settings, ...JSON.parse(storedSettings) };
-    } catch (_) {
-        // keep defaults
-    }
 }
 
 function saveChildren() {
     children.sort((a, b) => a.localeCompare(b, "de"));
     localStorage.setItem(STORAGE_CHILDREN, JSON.stringify(children));
-}
-
-function saveSettings() {
-    localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
 }
 
 // === Server Children Sync ===
@@ -285,16 +267,10 @@ async function sendMessage() {
     btnSend.disabled = true;
 
     try {
-        const messageId = encodeURIComponent(settings.messageId);
-        const resp = await fetch(`/api/v1/message/${messageId}/trigger`, {
+        const resp = await fetch("/message/send", {
             method: "POST",
             headers: authHeaders({ "Content-Type": "application/json" }),
-            body: JSON.stringify([
-                {
-                    name: "Name",
-                    text: { text: name },
-                },
-            ]),
+            body: JSON.stringify({ name }),
         });
 
         if (!resp.ok && resp.status !== 204) {
@@ -314,8 +290,8 @@ async function sendMessage() {
 
 async function clearMessage() {
     try {
-        const messageId = encodeURIComponent(settings.messageId);
-        const resp = await fetch(`/api/v1/message/${messageId}/clear`, {
+        const resp = await fetch("/message/clear", {
+            method: "POST",
             headers: authHeaders(),
         });
 
@@ -340,7 +316,7 @@ async function testConnection() {
     connectionStatus.className = "connection-status";
 
     try {
-        const resp = await fetch("/api/v1/messages", {
+        const resp = await fetch("/message/test", {
             headers: authHeaders(),
         });
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);

@@ -34,7 +34,7 @@ Use the **Presentation Messages API** to trigger messages on the audience screen
 
 A message must be pre-created in ProPresenter with the following configuration:
 
-- **Name**: `Eltern rufen` (or similar — configurable in the app)
+- **Name**: `Eltern rufen` (must match the `MESSAGE_NAME` environment variable on the server)
 - **Template text**: `Eltern von {Name}`
 - **Token**: a text token named `Name`
 - **Theme**: a suitable slide design (font size, colors, positioning) created in ProPresenter
@@ -72,6 +72,6 @@ GET /v1/message/{id}/clear
 ## Consequences
 
 - Visual design of the notification (fonts, colors, animation) is fully controlled in ProPresenter, keeping the app simple.
-- The app must know the message ID (name, UUID, or index) — this is configured in the app's settings view.
+- The message template name is configured on the **server** via the `MESSAGE_NAME` environment variable (default `Eltern rufen`). The PWA does not need to know this value.
 - ProPresenter's API has **no authentication**; security relies on the local network being trusted.
 - If the message template is deleted or renamed in ProPresenter, the app must be reconfigured.

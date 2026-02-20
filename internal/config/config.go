@@ -15,6 +15,8 @@ type Config struct {
 	// AuthToken is the bearer token for API authentication.
 	// If empty, a random token is generated on startup.
 	AuthToken string
+	// MessageName is the name of the ProPresenter message template to trigger.
+	MessageName string
 }
 
 // Load reads configuration from environment variables with sensible defaults.
@@ -25,6 +27,7 @@ func Load() Config {
 		ListenAddr:       getEnv("LISTEN_ADDR", ":8080"),
 		ChildrenFile:     getEnv("CHILDREN_FILE", "children.json"),
 		AuthToken:        os.Getenv("AUTH_TOKEN"),
+		MessageName:      getEnv("MESSAGE_NAME", "Eltern rufen"),
 	}
 }
 

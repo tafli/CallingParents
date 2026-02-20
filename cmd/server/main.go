@@ -13,8 +13,8 @@ import (
 	"github.com/calling-parents/calling-parents/internal/auth"
 	"github.com/calling-parents/calling-parents/internal/children"
 	"github.com/calling-parents/calling-parents/internal/config"
+	"github.com/calling-parents/calling-parents/internal/message"
 	"github.com/calling-parents/calling-parents/internal/network"
-	"github.com/calling-parents/calling-parents/internal/proxy"
 )
 
 //go:embed all:web
@@ -37,6 +37,7 @@ func main() {
 	lanURL := network.LanURL(cfg.ListenAddr) + "#token=" + token
 
 	log.Printf("ProPresenter API: %s", cfg.ProPresenterURL())
+	log.Printf("Message template: %s", cfg.MessageName)
 	log.Printf("Listening on %s", cfg.ListenAddr)
 
 	fmt.Println()
@@ -64,9 +65,11 @@ func main() {
 	// Children endpoint
 	mux.Handle("/children", childStore)
 
-	// API proxy: /api/* -> ProPresenter
-	apiProxy := proxy.New(cfg.ProPresenterURL())
-	mux.Handle("/api/", apiProxy)
+	// Message endpoints: send, clear, test connection
+	msgHandler := message.New(cfg.ProPresenterURL(), cfg.MessageName)
+	mux.HandleFunc("/message/send", msgHandler.HandleSend)
+	mux.HandleFunc("/message/clear", msgHandler.HandleClear)
+	mux.HandleFunc("/message/test", msgHandler.HandleTest)
 
 	// Static PWA files
 	webContent, err := fs.Sub(webFS, "web")
@@ -75,8 +78,8 @@ func main() {
 	}
 	mux.Handle("/", http.FileServer(http.FS(webContent)))
 
-	// Wrap mux with auth middleware: protect /api/ and /children.
-	protectedPrefixes := []string{"/api/", "/children"}
+	// Wrap mux with auth middleware: protect /message/ and /children.
+	protectedPrefixes := []string{"/message/", "/children"}
 	handler := auth.Middleware(token, protectedPrefixes)(mux)
 
 	if err := http.ListenAndServe(cfg.ListenAddr, handler); err != nil {

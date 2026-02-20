@@ -12,6 +12,7 @@ func TestLoadDefaults(t *testing.T) {
 	os.Unsetenv("LISTEN_ADDR")
 	os.Unsetenv("CHILDREN_FILE")
 	os.Unsetenv("AUTH_TOKEN")
+	os.Unsetenv("MESSAGE_NAME")
 
 	cfg := Load()
 
@@ -30,6 +31,9 @@ func TestLoadDefaults(t *testing.T) {
 	if cfg.AuthToken != "" {
 		t.Errorf("expected AuthToken=empty, got %s", cfg.AuthToken)
 	}
+	if cfg.MessageName != "Eltern rufen" {
+		t.Errorf("expected MessageName=Eltern rufen, got %s", cfg.MessageName)
+	}
 }
 
 func TestLoadFromEnv(t *testing.T) {
@@ -37,11 +41,13 @@ func TestLoadFromEnv(t *testing.T) {
 	os.Setenv("PROPRESENTER_PORT", "9999")
 	os.Setenv("LISTEN_ADDR", ":3000")
 	os.Setenv("AUTH_TOKEN", "my-secret-token")
+	os.Setenv("MESSAGE_NAME", "Custom Message")
 	defer func() {
 		os.Unsetenv("PROPRESENTER_HOST")
 		os.Unsetenv("PROPRESENTER_PORT")
 		os.Unsetenv("LISTEN_ADDR")
 		os.Unsetenv("AUTH_TOKEN")
+		os.Unsetenv("MESSAGE_NAME")
 	}()
 
 	cfg := Load()
@@ -57,6 +63,9 @@ func TestLoadFromEnv(t *testing.T) {
 	}
 	if cfg.AuthToken != "my-secret-token" {
 		t.Errorf("expected AuthToken=my-secret-token, got %s", cfg.AuthToken)
+	}
+	if cfg.MessageName != "Custom Message" {
+		t.Errorf("expected MessageName=Custom Message, got %s", cfg.MessageName)
 	}
 }
 

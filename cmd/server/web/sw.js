@@ -27,8 +27,8 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
     const url = new URL(event.request.url);
 
-    // API calls: always go to network (they need ProPresenter to be reachable)
-    if (url.pathname.startsWith("/api/")) {
+    // API calls: always go to network (they need the server to be reachable)
+    if (url.pathname.startsWith("/message/") || url.pathname.startsWith("/children")) {
         event.respondWith(fetch(event.request));
         return;
     }

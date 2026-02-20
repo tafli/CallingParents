@@ -1,8 +1,8 @@
-# ADR-006: CORS Handling — Go Reverse Proxy
+# ADR-006: CORS Handling — Go Backend Proxy
 
 ## Status
 
-Accepted
+Accepted (amended)
 
 ## Date
 
@@ -25,31 +25,30 @@ The PWA runs in a browser on the Android phone and needs to make HTTP requests t
 
 ## Decision
 
-The Go server acts as a **transparent reverse proxy** for all ProPresenter API requests.
+The Go server acts as a **backend proxy** for ProPresenter API requests using purpose-built endpoints.
 
 ### URL Mapping
 
-| Browser Request | Proxied To |
-|-----------------|------------|
-| `GET /api/v1/messages` | `GET http://<PP_HOST>:<PP_PORT>/v1/messages` |
-| `POST /api/v1/message/{id}/trigger` | `POST http://<PP_HOST>:<PP_PORT>/v1/message/{id}/trigger` |
-| `GET /api/v1/message/{id}/clear` | `GET http://<PP_HOST>:<PP_PORT>/v1/message/{id}/clear` |
-| `GET /api/v1/clear/layer/messages` | `GET http://<PP_HOST>:<PP_PORT>/v1/clear/layer/messages` |
+| Browser Request | Server Action |
+|-----------------|---------------|
+| `POST /message/send` (`{"name":"Paul"}`) | `POST http://<PP_HOST>:<PP_PORT>/v1/message/<MESSAGE_NAME>/trigger` |
+| `POST /message/clear` | `GET http://<PP_HOST>:<PP_PORT>/v1/message/<MESSAGE_NAME>/clear` |
+| `GET /message/test` | `GET http://<PP_HOST>:<PP_PORT>/v1/messages` |
 
-The `/api/` prefix is stripped before forwarding to ProPresenter. All other paths serve static PWA files.
+The PWA sends only the child's name; the server resolves the ProPresenter message template name from the `MESSAGE_NAME` environment variable. All other paths serve static PWA files.
 
 ### Implementation
 
-Using Go's `net/http/httputil.ReverseProxy` with a custom `Director` function that:
+Using purpose-built HTTP handlers in `internal/message/` that:
 
-1. Strips the `/api/` prefix from the request URL path.
-2. Sets the target scheme, host, and port to the ProPresenter address.
-3. Forwards all headers, query parameters, and request body unchanged.
+1. Accept simplified requests from the PWA (just the child's name for send, nothing for clear/test).
+2. Construct the appropriate ProPresenter API request using the configured message template name.
+3. Forward the request to ProPresenter and return the result.
 
 ## Consequences
 
 - **No CORS issues**: all requests from the browser go to the same origin (the Go server), so no cross-origin restrictions apply.
-- **Transparency**: the proxy forwards requests and responses without modification (except the URL rewrite), so any ProPresenter API endpoint is accessible.
+- **Encapsulation**: the PWA does not need to know the ProPresenter message template name or API structure. Only the child's name is sent.
 - **Single point of access**: the Android phone only needs to know the Go server's address, not the ProPresenter machine's address directly.
-- **Latency**: adds a small hop through the Go proxy. On a local network, this is negligible (sub-millisecond).
-- **Coupling**: if ProPresenter's API changes, only the PWA frontend needs updating; the proxy is generic and forwards any path under `/api/`.
+- **Latency**: adds a small hop through the Go server. On a local network, this is negligible (sub-millisecond).
+- **Tight contract**: the server exposes only the three operations needed (send, clear, test), not the full ProPresenter API.

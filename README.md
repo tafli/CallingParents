@@ -15,13 +15,14 @@ All architecture decisions are documented as ADRs in [`docs/architecture/`](docs
 | [003](docs/architecture/003-propresenter-integration.md) | ProPresenter Integration |
 | [004](docs/architecture/004-data-management.md) | Data Management — Browser localStorage |
 | [005](docs/architecture/005-deployment.md) | Deployment — Go Binary with Embedded PWA |
-| [006](docs/architecture/006-cors-api-proxy.md) | CORS Handling — Go Reverse Proxy |
+| [006](docs/architecture/006-cors-api-proxy.md) | CORS Handling — Go Backend Proxy |
+| [007](docs/architecture/007-authentication.md) | Authentication — Bearer Token via QR Code |
 
 ## Prerequisites
 
 - **ProPresenter** running with the API enabled (Settings → Network)
 - A **message template** created in ProPresenter:
-  - Name: `Eltern rufen` (or any name — configurable in the app)
+  - Name: `Eltern rufen` (must match the `MESSAGE_NAME` environment variable)
   - Template text: `Eltern von {Name}`
   - Token: text token named `Name`
   - Theme: your preferred slide design
@@ -73,6 +74,7 @@ run.bat
 | `PROPRESENTER_PORT` | `50001` | ProPresenter API port |
 | `LISTEN_ADDR` | `:8080` | Server listen address |
 | `CHILDREN_FILE` | `children.json` | Path to children names JSON file |
+| `MESSAGE_NAME` | `Eltern rufen` | ProPresenter message template name |
 
 ## Usage
 
@@ -80,7 +82,6 @@ run.bat
 2. On the Android phone, open Chrome and go to `http://<server-ip>:8080`.
 3. When prompted, tap "Add to Home Screen" to install the PWA.
 4. Open the app → tap ⚙ (Settings):
-   - Set the ProPresenter message name (default: `Eltern rufen`).
    - Tap "Verbindung testen" to verify connectivity.
    - Add children's names for quick selection.
 5. To call parents: tap a child's name (or type one) → tap **Senden**.
@@ -115,7 +116,7 @@ internal/
   children/            — Loads children names from JSON file, serves GET /children
   config/              — Configuration from environment variables
   network/             — LAN IP detection for QR code
-  proxy/               — Reverse proxy to ProPresenter API
+  message/             — ProPresenter message send/clear/test handlers
 docs/architecture/     — Architecture Decision Records
 children.json.example  — Example children names file
 ```
