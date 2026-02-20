@@ -34,6 +34,19 @@ function authHeaders(extra = {}) {
     return headers;
 }
 
+// Wrapper around fetch that handles 401 by clearing credentials and reloading.
+async function authFetch(url, options = {}) {
+    const resp = await fetch(url, options);
+    if (resp.status === 401) {
+        localStorage.removeItem(STORAGE_TOKEN);
+        authToken = "";
+        window.location.reload();
+        // Return a never-resolving promise so callers don't continue.
+        return new Promise(() => {});
+    }
+    return resp;
+}
+
 // === DOM Elements ===
 const viewMain = document.getElementById("view-main");
 const viewSettings = document.getElementById("view-settings");
@@ -114,7 +127,7 @@ function saveChildren() {
 // === Server Children Sync ===
 async function fetchServerChildren() {
     try {
-        const resp = await fetch("/children", {
+        const resp = await authFetch("/children", {
             headers: authHeaders(),
         });
         if (!resp.ok) return;
@@ -144,7 +157,7 @@ async function fetchServerChildren() {
 // Full replace of local list with server list.
 async function reloadChildren() {
     try {
-        const resp = await fetch("/children", {
+        const resp = await authFetch("/children", {
             headers: authHeaders(),
         });
         if (!resp.ok) {
@@ -252,7 +265,7 @@ function addChild() {
     inputAddChild.focus();
 
     // Persist to server-side children file (fire-and-forget).
-    fetch("/children", {
+    authFetch("/children", {
         method: "POST",
         headers: authHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({ name }),
@@ -269,7 +282,7 @@ function removeChild(index) {
 
     // Sync deletion to server (fire-and-forget).
     if (name) {
-        fetch("/children", {
+        authFetch("/children", {
             method: "DELETE",
             headers: authHeaders({ "Content-Type": "application/json" }),
             body: JSON.stringify({ name }),
@@ -287,7 +300,7 @@ async function sendMessage() {
     btnSend.disabled = true;
 
     try {
-        const resp = await fetch("/message/send", {
+        const resp = await authFetch("/message/send", {
             method: "POST",
             headers: authHeaders({ "Content-Type": "application/json" }),
             body: JSON.stringify({ name }),
@@ -316,7 +329,7 @@ async function sendMessage() {
 
 async function clearMessage() {
     try {
-        const resp = await fetch("/message/clear", {
+        const resp = await authFetch("/message/clear", {
             method: "POST",
             headers: authHeaders(),
         });
@@ -343,7 +356,7 @@ async function testConnection() {
     connectionStatus.className = "connection-status";
 
     try {
-        const resp = await fetch("/message/test", {
+        const resp = await authFetch("/message/test", {
             headers: authHeaders(),
         });
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -390,7 +403,7 @@ function showToast(message, type) {
 // === Server Config ===
 async function fetchConfig() {
     try {
-        const resp = await fetch("/message/config", {
+        const resp = await authFetch("/message/config", {
             headers: authHeaders(),
         });
         if (!resp.ok) return;
@@ -406,7 +419,7 @@ async function fetchConfig() {
 // === Connection Status Polling ===
 async function checkConnection() {
     try {
-        const resp = await fetch("/message/test", {
+        const resp = await authFetch("/message/test", {
             headers: authHeaders(),
         });
         if (resp.ok) {
@@ -463,7 +476,7 @@ async function autoClearExpired() {
     stopAutoClear();
     // Auto-clear the message
     try {
-        const resp = await fetch("/message/clear", {
+        const resp = await authFetch("/message/clear", {
             method: "POST",
             headers: authHeaders(),
         });
