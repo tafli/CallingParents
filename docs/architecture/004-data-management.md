@@ -33,7 +33,14 @@ Use a **server-side `children.json` file** as the source of truth for the childr
 2. On startup, the server loads and sorts the file.
 3. The PWA calls `GET /children` on every load.
 4. Server names not already in localStorage are added (merge, not replace).
-5. Workers can still add names locally via the settings screen for ad-hoc children.
+5. Workers can add names via the settings screen — these are saved locally **and** sent to the server via `POST /children` so all devices share the same list.
+
+### API
+
+| Method | Path | Body | Description |
+|--------|------|------|-------------|
+| `GET` | `/children` | — | Returns the current names as a JSON array. |
+| `POST` | `/children` | `{"name":"..."}` | Adds a name to the server list and persists to `children.json`. Returns `201` with updated list, or `200` if the name already exists. |
 
 ### `children.json` Format
 
@@ -65,5 +72,5 @@ If the file does not exist, the server starts with an empty list and the PWA fal
 - **Central management**: the admin edits one file; all phones auto-sync on next load.
 - **Merge strategy**: server names are additive — they never remove locally-added names. This lets workers add ad-hoc children while keeping the server list as the base.
 - **Offline resilience**: if the server is unreachable, the PWA uses the cached localStorage list.
-- **Near-stateless server**: the only server-side state is a read-only JSON file. No database, no write endpoints.
+- **Near-stateless server**: the only server-side state is a JSON file. The server accepts `POST` to add names, keeping it in sync across all clients.
 - **Easy reset**: deleting localStorage on the phone reverts to the server-provided list on next load.

@@ -191,6 +191,15 @@ function addChild() {
     renderChildrenList();
     inputAddChild.value = "";
     inputAddChild.focus();
+
+    // Persist to server-side children file (fire-and-forget).
+    fetch("/children", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+    }).catch(() => {
+        // Server sync is best-effort; localStorage is the primary store.
+    });
 }
 
 function removeChild(index) {

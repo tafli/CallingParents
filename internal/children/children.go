@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"sort"
+	"strings"
 	"sync"
 )
 
@@ -36,13 +37,21 @@ func (s *Store) Names() []string {
 	return out
 }
 
-// ServeHTTP handles GET /children — returns the names as a JSON array.
+// ServeHTTP handles GET /children and POST /children.
+// GET returns the names as a JSON array.
+// POST accepts {"name":"..."} and adds the name to the list, persisting to disk.
 func (s *Store) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
+	switch r.Method {
+	case http.MethodGet:
+		s.handleGet(w, r)
+	case http.MethodPost:
+		s.handlePost(w, r)
+	default:
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-		return
 	}
+}
 
+func (s *Store) handleGet(w http.ResponseWriter, _ *http.Request) {
 	s.mu.RLock()
 	names := s.names
 	s.mu.RUnlock()
@@ -51,6 +60,66 @@ func (s *Store) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(names); err != nil {
 		http.Error(w, "encoding error", http.StatusInternalServerError)
 	}
+}
+
+// addRequest is the expected JSON body for POST /children.
+type addRequest struct {
+	Name string `json:"name"`
+}
+
+func (s *Store) handlePost(w http.ResponseWriter, r *http.Request) {
+	var req addRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "invalid JSON body", http.StatusBadRequest)
+		return
+	}
+
+	name := strings.TrimSpace(req.Name)
+	if name == "" {
+		http.Error(w, "name must not be empty", http.StatusBadRequest)
+		return
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	// Check for duplicate (case-sensitive).
+	for _, existing := range s.names {
+		if existing == name {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(s.names)
+			return
+		}
+	}
+
+	s.names = append(s.names, name)
+	sort.Slice(s.names, func(i, j int) bool {
+		return s.names[i] < s.names[j]
+	})
+
+	if err := s.save(); err != nil {
+		// Roll back the append on save failure.
+		s.load()
+		http.Error(w, "failed to persist name", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(s.names)
+}
+
+func (s *Store) save() error {
+	data, err := json.MarshalIndent(s.names, "", "  ")
+	if err != nil {
+		return fmt.Errorf("marshalling children: %w", err)
+	}
+	data = append(data, '\n')
+	if err := os.WriteFile(s.filePath, data, 0644); err != nil {
+		return fmt.Errorf("writing children file %q: %w", s.filePath, err)
+	}
+	return nil
 }
 
 func (s *Store) load() error {
