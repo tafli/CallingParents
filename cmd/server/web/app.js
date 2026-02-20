@@ -57,6 +57,13 @@ const statusDot = document.getElementById("status-dot");
 // === Initialization ===
 function init() {
     initToken();
+
+    // If no token is available, show auth error and block all interaction.
+    if (!authToken) {
+        document.getElementById("auth-error").classList.remove("hidden");
+        return;
+    }
+
     loadData();
     renderChildrenGrid();
     renderChildrenList();

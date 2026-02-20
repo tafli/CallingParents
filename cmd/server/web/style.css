@@ -380,6 +380,43 @@ header h1 {
     font-size: 0.8rem;
 }
 
+/* Auth error overlay */
+.auth-error {
+    position: fixed;
+    inset: 0;
+    background: var(--color-bg);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+}
+
+.auth-error.hidden {
+    display: none;
+}
+
+.auth-error-content {
+    max-width: 320px;
+}
+
+.auth-error-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 16px;
+}
+
+.auth-error h2 {
+    margin-bottom: 8px;
+    color: var(--color-danger);
+}
+
+.auth-error p {
+    color: var(--color-text-light);
+    line-height: 1.5;
+}
+
 /* Empty state */
 .children-grid:empty::after {
     content: "Keine Kinder eingetragen. Öffne die Einstellungen (⚙), um Namen hinzuzufügen.";
