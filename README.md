@@ -109,10 +109,13 @@ cmd/server/
   main.go              — Server entrypoint, embeds web/ and starts HTTP server
   web/                 — PWA static files (embedded into binary)
     index.html         — App shell
-    app.js             — Application logic
-    style.css          — Mobile-first styles
     manifest.json      — PWA manifest
     sw.js              — Service worker
+    js/
+      app.js           — Application logic
+      i18n.js          — Internationalization (de, en)
+    css/
+      style.css        — Mobile-first styles
     icons/             — App icons
 internal/
   children/            — Loads children names from JSON file, serves GET /children

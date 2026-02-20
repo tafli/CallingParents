@@ -70,6 +70,8 @@ const btnClearInput = document.getElementById("btn-clear-input");
 
 // === Initialization ===
 function init() {
+    initI18n();
+    applyI18nToDOM();
     initToken();
 
     // If no token is available, show auth error and block all interaction.
@@ -81,6 +83,7 @@ function init() {
     loadData();
     renderChildrenGrid();
     renderChildrenList();
+    renderLanguagePicker();
 
     // Fetch server-side children list, then merge
     fetchServerChildren();
@@ -127,7 +130,7 @@ function loadData() {
 }
 
 function saveChildren() {
-    children.sort((a, b) => a.localeCompare(b, "de"));
+    children.sort((a, b) => a.localeCompare(b, currentLang));
     localStorage.setItem(STORAGE_CHILDREN, JSON.stringify(children));
 }
 
@@ -168,13 +171,13 @@ async function reloadChildren() {
             headers: authHeaders(),
         });
         if (!resp.ok) {
-            showToast("Serverliste konnte nicht geladen werden", "error");
+            showToast(t("toast.serverListFailed"), "error");
             return;
         }
 
         const serverNames = await resp.json();
         if (!Array.isArray(serverNames)) {
-            showToast("Ungültige Antwort vom Server", "error");
+            showToast(t("toast.serverInvalidResponse"), "error");
             return;
         }
 
@@ -182,9 +185,9 @@ async function reloadChildren() {
         saveChildren();
         renderChildrenGrid();
         renderChildrenList();
-        showToast(`${children.length} Namen vom Server geladen`, "success");
+        showToast(t("toast.serverListLoaded", { count: children.length }), "success");
     } catch (_) {
-        showToast("Server nicht erreichbar", "error");
+        showToast(t("toast.serverUnreachable"), "error");
     }
 }
 
@@ -192,14 +195,14 @@ async function reloadChildren() {
 function showSettings() {
     viewMain.classList.add("hidden");
     viewSettings.classList.remove("hidden");
-    headerTitle.textContent = "Einstellungen";
+    headerTitle.textContent = t("settings.title");
     btnSettings.classList.add("hidden");
 }
 
 function showMain() {
     viewSettings.classList.add("hidden");
     viewMain.classList.remove("hidden");
-    headerTitle.textContent = "Eltern rufen";
+    headerTitle.textContent = t("app.title");
     btnSettings.classList.remove("hidden");
     renderChildrenGrid();
 }
@@ -207,6 +210,13 @@ function showMain() {
 // === Children Grid (Main View) ===
 function renderChildrenGrid() {
     childrenGrid.innerHTML = "";
+    if (children.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "children-grid-empty";
+        empty.textContent = t("grid.empty");
+        childrenGrid.appendChild(empty);
+        return;
+    }
     children.forEach((name) => {
         const btn = document.createElement("button");
         btn.className = "child-btn";
@@ -250,7 +260,7 @@ function renderChildrenList() {
         const removeBtn = document.createElement("button");
         removeBtn.className = "btn-remove";
         removeBtn.textContent = "✕";
-        removeBtn.setAttribute("aria-label", `${name} entfernen`);
+        removeBtn.setAttribute("aria-label", t("aria.removeChild", { name }));
         removeBtn.addEventListener("click", () => removeChild(index));
 
         li.appendChild(span);
@@ -263,7 +273,7 @@ function addChild() {
     const name = inputAddChild.value.trim();
     if (!name) return;
     if (children.includes(name)) {
-        showToast(`"${name}" ist bereits vorhanden`, "error");
+        showToast(t("toast.childExists", { name }), "error");
         return;
     }
 
@@ -320,8 +330,8 @@ async function sendMessage() {
         }
 
         activeMessage = true;
-        showStatus(`Anzeige: "Eltern von ${name}"`, "active");
-        showToast(`Nachricht gesendet: ${name} ✓`, "success");
+        showStatus(t("status.showing", { name }), "active");
+        showToast(t("toast.sent", { name }), "success");
 
         // Haptic feedback
         if (navigator.vibrate) navigator.vibrate(100);
@@ -329,8 +339,8 @@ async function sendMessage() {
         // Start auto-clear countdown
         startAutoClear();
     } catch (err) {
-        showToast(`Fehler: ${err.message}`, "error");
-        showStatus("Senden fehlgeschlagen", "error");
+        showToast(t("toast.sendFailed", { error: err.message }), "error");
+        showStatus(t("status.sendFailed"), "error");
     } finally {
         btnSend.disabled = !inputName.value.trim();
     }
@@ -350,18 +360,18 @@ async function clearMessage() {
         activeMessage = false;
         hideStatus();
         stopAutoClear();
-        showToast("Nachricht gelöscht", "success");
+        showToast(t("toast.cleared"), "success");
 
         // Reset selection
         inputName.value = "";
         onNameInput();
     } catch (err) {
-        showToast(`Fehler: ${err.message}`, "error");
+        showToast(t("toast.sendFailed", { error: err.message }), "error");
     }
 }
 
 async function testConnection() {
-    connectionStatus.textContent = "Teste Verbindung…";
+    connectionStatus.textContent = t("connection.testing");
     connectionStatus.className = "connection-status";
 
     try {
@@ -372,10 +382,10 @@ async function testConnection() {
 
         const data = await resp.json();
         const count = Array.isArray(data) ? data.length : 0;
-        connectionStatus.textContent = `Verbunden — ${count} Nachricht(en) gefunden`;
+        connectionStatus.textContent = t("connection.success", { count });
         connectionStatus.className = "connection-status success";
     } catch (err) {
-        connectionStatus.textContent = `Verbindung fehlgeschlagen: ${err.message}`;
+        connectionStatus.textContent = t("connection.failed", { error: err.message });
         connectionStatus.className = "connection-status error";
     }
 }
@@ -432,7 +442,7 @@ function setConnectionState(connected) {
 
     // Status dot
     statusDot.className = connected ? "status-dot connected" : "status-dot disconnected";
-    statusDot.title = connected ? "ProPresenter verbunden" : "ProPresenter nicht erreichbar";
+    statusDot.title = connected ? t("connection.connected") : t("connection.disconnected");
 
     // Header color
     const header = document.querySelector("header");
@@ -519,12 +529,35 @@ async function autoClearExpired() {
         }
         activeMessage = false;
         hideStatus();
-        showToast("Nachricht automatisch gelöscht", "success");
+        showToast(t("toast.autoCleared"), "success");
         inputName.value = "";
         onNameInput();
     } catch (err) {
-        showToast(`Auto-Löschen fehlgeschlagen: ${err.message}`, "error");
+        showToast(t("toast.autoClearFailed", { error: err.message }), "error");
     }
+}
+
+// === Language Picker ===
+function renderLanguagePicker() {
+    const picker = document.getElementById("language-picker");
+    if (!picker) return;
+    picker.innerHTML = "";
+    availableLanguages.forEach(({ code, label }) => {
+        const btn = document.createElement("button");
+        btn.textContent = label;
+        btn.className = "btn" + (code === currentLang ? " active" : "");
+        btn.addEventListener("click", () => {
+            setLanguage(code);
+            applyI18nToDOM();
+            renderChildrenGrid();
+            renderChildrenList();
+            renderLanguagePicker();
+            // Update header title based on current view
+            headerTitle.textContent = viewSettings.classList.contains("hidden")
+                ? t("app.title") : t("settings.title");
+        });
+        picker.appendChild(btn);
+    });
 }
 
 // === Service Worker Registration ===

@@ -427,6 +427,34 @@ header h1 {
     padding-bottom: 24px;
 }
 
+/* Language picker */
+.language-picker {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.language-picker button {
+    padding: 8px 16px;
+    font-size: 0.95rem;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.language-picker button:hover {
+    border-color: var(--color-primary);
+}
+
+.language-picker button.active {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: white;
+}
+
 /* Version footer in settings */
 .version-footer {
     text-align: center;
@@ -473,8 +501,7 @@ header h1 {
 }
 
 /* Empty state */
-.children-grid:empty::after {
-    content: "Keine Kinder eingetragen. Öffne die Einstellungen (⚙), um Namen hinzuzufügen.";
+.children-grid-empty {
     grid-column: 1 / -1;
     text-align: center;
     color: var(--color-text-light);
