@@ -2,6 +2,8 @@
 
 [![GitHub release](https://img.shields.io/github/v/release/tafli/CallingParents)](https://github.com/tafli/CallingParents/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/tafli/CallingParents/blob/main/LICENSE)
+[![Go](https://img.shields.io/github/go-mod/go-version/tafli/CallingParents)](https://github.com/tafli/CallingParents/blob/main/go.mod)
+[![Go Report Card](https://goreportcard.com/badge/github.com/tafli/CallingParents)](https://goreportcard.com/report/github.com/tafli/CallingParents)
 [![CI](https://github.com/tafli/CallingParents/actions/workflows/ci.yml/badge.svg)](https://github.com/tafli/CallingParents/actions/workflows/ci.yml)
 [![Release](https://github.com/tafli/CallingParents/actions/workflows/release.yml/badge.svg)](https://github.com/tafli/CallingParents/actions/workflows/release.yml)
 
