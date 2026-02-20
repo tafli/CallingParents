@@ -94,6 +94,13 @@ The GitHub Actions workflow attaches the following files to each release:
 | `config.toml.example` | Configuration template |
 | `children.json.example` | Sample children list |
 | `run.bat` | Windows startup script |
+| `checksums.txt` | SHA-256 checksums for binaries |
+
+Binaries are built with `-s -w` ldflags to strip debug symbols and DWARF information, reducing binary size.
+
+### Continuous Integration
+
+A separate CI workflow (`.github/workflows/ci.yml`) runs on every push to `main`/`master` and on pull requests. It performs format checks (`gofmt`), `go vet`, and `go test` to catch issues before they reach a release tag.
 
 ### Deployment Steps (Windows)
 

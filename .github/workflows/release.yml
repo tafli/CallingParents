@@ -44,7 +44,8 @@ jobs:
           COMMIT: ${{ steps.meta.outputs.commit }}
           DATE: ${{ steps.meta.outputs.date }}
         run: |
-          LDFLAGS="-X github.com/tafli/calling-parents/internal/version.Version=${VERSION}"
+          LDFLAGS="-s -w"
+          LDFLAGS+=" -X github.com/tafli/calling-parents/internal/version.Version=${VERSION}"
           LDFLAGS+=" -X github.com/tafli/calling-parents/internal/version.Commit=${COMMIT}"
           LDFLAGS+=" -X github.com/tafli/calling-parents/internal/version.Date=${DATE}"
 
@@ -62,6 +63,13 @@ jobs:
           cp children.json.example dist/
           cp run.bat dist/
 
+      - name: Generate checksums
+        run: |
+          cd dist/
+          sha256sum calling_parents-linux-amd64 calling_parents-windows-amd64.exe > checksums.txt
+          echo "Checksums:"
+          cat checksums.txt
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -72,3 +80,4 @@ jobs:
             dist/config.toml.example
             dist/children.json.example
             dist/run.bat
+            dist/checksums.txt
