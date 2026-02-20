@@ -176,6 +176,14 @@ docs/architecture/     — Architecture Decision Records (ADRs)
 | [006](docs/architecture/006-cors-api-proxy.md) | CORS Handling — Go Backend Proxy |
 | [007](docs/architecture/007-authentication.md) | Authentication — Bearer Token via QR Code |
 
+## Releasing
+
+```bash
+./release.sh v1.0.0
+```
+
+This validates the version, checks for a clean working tree, creates an annotated Git tag, and pushes it. The [GitHub Actions workflow](.github/workflows/release.yml) then builds, tests, and publishes a GitHub Release with binaries and config files attached.
+
 ## Development
 
 ```bash

@@ -24,11 +24,20 @@ go vet ./...
 echo "==> Testing..."
 go test ./...
 
+echo "==> Cleaning dist/..."
+rm -rf dist/
+mkdir -p dist/
+
 echo "==> Building linux/amd64..."
 GOOS=linux GOARCH=amd64 go build -ldflags "${LDFLAGS}" -o dist/calling_parents-linux-amd64 ./cmd/server
 
 echo "==> Building windows/amd64..."
 GOOS=windows GOARCH=amd64 go build -ldflags "${LDFLAGS}" -o dist/calling_parents-windows-amd64.exe ./cmd/server
+
+echo "==> Copying distribution files..."
+cp config.toml.example dist/
+cp children.json.example dist/
+cp run.bat dist/
 
 echo ""
 echo "==> Build complete:"

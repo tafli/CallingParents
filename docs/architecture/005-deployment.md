@@ -70,10 +70,35 @@ A `config.toml.example` file is provided as a reference. If no `config.toml` exi
 
 When the application is updated with new configuration options, existing `config.toml` files are **automatically upgraded**: on startup, the server detects missing keys and appends them (with comments and defaults) to the end of the file. Before modifying the file, a backup is saved as `config.toml.bak`. Keys that the user has already set (or that exist as commented-out entries) are never overwritten. The default config content is generated from a single source of truth (`allConfigBlocks` in `config.go`), ensuring the auto-created file and the merge logic always stay in sync.
 
+### Release Process
+
+Releases are handled by a combination of a local `release.sh` script and a GitHub Actions workflow:
+
+1. **`release.sh <version>`** — local script that validates the version (semver `vX.Y.Z`), checks for a clean working tree, creates an annotated Git tag, and pushes it to the remote.
+2. **`.github/workflows/release.yml`** — triggered on `v*` tag pushes. Runs format check, vet, tests, cross-compiles both binaries, and creates a GitHub Release with all distribution assets attached.
+
+To create a release:
+
+```bash
+./release.sh v1.0.0
+```
+
+The script performs pre-flight checks (clean tree, correct branch, tag doesn't exist, remote reachable, branch up to date) and prompts for confirmation before pushing.
+
+The GitHub Actions workflow attaches the following files to each release:
+
+| File | Description |
+|------|-------------|
+| `calling_parents-linux-amd64` | Linux binary |
+| `calling_parents-windows-amd64.exe` | Windows binary |
+| `config.toml.example` | Configuration template |
+| `children.json.example` | Sample children list |
+| `run.bat` | Windows startup script |
+
 ### Deployment Steps (Windows)
 
-1. On the development machine, run `./build.sh` to produce both binaries.
-2. Copy `dist/calling_parents-windows-amd64.exe` and `config.toml.example` to the ProPresenter Windows machine.
+1. Download the latest release from [GitHub Releases](https://github.com/tafli/calling-parents/releases) (or run `./build.sh` locally).
+2. Copy `calling_parents-windows-amd64.exe` and `config.toml.example` to the ProPresenter Windows machine.
 3. Rename `config.toml.example` to `config.toml` and adjust values (typically `propresenter_host = "localhost"`).
 4. Optionally copy `run.bat` to the same directory for convenient startup.
 5. Run `calling_parents-windows-amd64.exe` (or `run.bat`).
