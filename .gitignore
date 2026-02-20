@@ -49,5 +49,6 @@ google-services.json
 
 # ---> Go / Project
 config.toml
+children.json
 calling_parents
 dist/

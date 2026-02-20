@@ -194,7 +194,7 @@ go test ./...      # test
 
 ## License
 
-<!-- TODO: Add license -->
+This project is licensed under the [MIT License](LICENSE).
 
 ## Contributing
 
