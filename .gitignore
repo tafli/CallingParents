@@ -47,3 +47,7 @@ google-services.json
 # Android Profiling
 *.hprof
 
+# ---> Go / Project
+.env
+calling_parents
+dist/
