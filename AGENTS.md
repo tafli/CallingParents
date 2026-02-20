@@ -27,7 +27,7 @@ A PWA served by a Go binary that lets church child care workers send "Eltern von
 ### Key components
 
 - **`cmd/server/main.go`** — HTTP server entry point; embeds `web/` via `embed.FS`, mounts the reverse proxy on `/api/` and the file server on `/`.
-- **`internal/config/`** — Reads `PROPRESENTER_HOST`, `PROPRESENTER_PORT`, `LISTEN_ADDR` from environment variables.
+- **`internal/config/`** — Reads `config.toml` (TOML format) with environment variable overrides.
 - **`internal/proxy/`** — `httputil.ReverseProxy` that strips `/api` prefix and forwards to ProPresenter.
 - **`cmd/server/web/`** — PWA frontend: `index.html`, `manifest.json`, `sw.js`, `js/` (app.js, i18n.js), `css/` (style.css), `lang/` (de.json, en.json), `icons/`.
 
@@ -89,7 +89,7 @@ A PWA served by a Go binary that lets church child care workers send "Eltern von
 ## Security considerations
 
 - Never log token values. Never expose secrets in error responses.
-- Never commit `.env` files to version control.
+- Never commit `config.toml` files to version control.
 - Do not add TLS handling to the Go service — TLS is terminated by a reverse proxy (see ADR-006).
 - Do not introduce endpoints that forward arbitrary user input to the Shelly device.
 - Keep dependencies at the bare minimum. Run `go mod verify` to validate module integrity.

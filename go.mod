@@ -3,6 +3,7 @@ module github.com/tafli/calling-parents
 go 1.25.0
 
 require (
+	github.com/BurntSushi/toml v1.6.0 // indirect
 	github.com/mdp/qrterminal/v3 v3.2.1 // indirect
 	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/term v0.13.0 // indirect

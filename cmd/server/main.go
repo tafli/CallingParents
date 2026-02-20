@@ -25,7 +25,16 @@ var webFS embed.FS
 func main() {
 	log.Printf("calling-parents %s", version.Info())
 
-	cfg := config.Load()
+	// Determine config file path: flag > default "config.toml".
+	configPath := "config.toml"
+	if len(os.Args) > 1 {
+		configPath = os.Args[1]
+	}
+
+	cfg, err := config.Load(configPath)
+	if err != nil {
+		log.Fatalf("failed to load config: %v", err)
+	}
 
 	// Resolve auth token: use env var or generate a random one.
 	token := cfg.AuthToken
@@ -35,7 +44,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("failed to generate auth token: %v", err)
 		}
-		log.Println("Generated random auth token (set AUTH_TOKEN env to use a fixed one)")
+		log.Println("Generated random auth token (set auth_token in config.toml to use a fixed one)")
 	}
 
 	lanURL := network.LanURL(cfg.ListenAddr) + "#token=" + token

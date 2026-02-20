@@ -1,0 +1,30 @@
+# Calling Parents — Configuration
+# Copy this file to config.toml and adjust values.
+
+# Hostname or IP of the ProPresenter machine.
+propresenter_host = "localhost"
+
+# ProPresenter API port (default in ProPresenter: 50001).
+propresenter_port = "50001"
+
+# Address and port this server listens on.
+listen_addr = ":8080"
+
+# Path to the JSON file with children's names (see children.json.example).
+children_file = "children.json"
+
+# ProPresenter message template name (must match the message name in ProPresenter).
+message_name = "Eltern rufen"
+
+# Seconds after which a displayed message is automatically cleared.
+# Set to 0 to disable auto-clear.
+auto_clear_seconds = 30
+
+# Path to activity log file (JSONL format, append-only).
+# Records send/clear events with timestamps. Leave empty to disable.
+# activity_log = "activity.jsonl"
+
+# Bearer token for API authentication.
+# If not set, a random token is generated on each startup (printed in QR code).
+# Set this for a stable token that survives restarts.
+# auth_token = ""

@@ -58,21 +58,21 @@ Without Git tags, the version defaults to the commit hash. Without ldflags (e.g.
 
 ### Configuration
 
-All configuration is via environment variables:
+All configuration is via a `config.toml` file (TOML format), with optional environment variable overrides for Docker/CI. The Go binary reads the file directly — no shell sourcing needed.
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `PROPRESENTER_HOST` | `localhost` | Hostname/IP of the ProPresenter machine |
-| `PROPRESENTER_PORT` | `50001` | ProPresenter API port |
-| `LISTEN_ADDR` | `:8080` | Address and port the server listens on |
+| Variable | TOML key | Default | Description |
+|----------|----------|---------|-------------|
+| `PROPRESENTER_HOST` | `propresenter_host` | `localhost` | Hostname/IP of the ProPresenter machine |
+| `PROPRESENTER_PORT` | `propresenter_port` | `50001` | ProPresenter API port |
+| `LISTEN_ADDR` | `listen_addr` | `:8080` | Address and port the server listens on |
 
-A `.env-template` file is provided. Copy it to `.env` and adjust values. Both `run.sh` (Linux) and `run.bat` (Windows) load `.env` automatically.
+A `config.toml.example` file is provided. Copy it to `config.toml` and adjust values.
 
 ### Deployment Steps (Windows)
 
 1. On the development machine, run `./build.sh` to produce both binaries.
-2. Copy `dist/calling_parents-windows-amd64.exe` and `.env-template` to the ProPresenter Windows machine.
-3. Rename `.env-template` to `.env` and adjust values (typically `PROPRESENTER_HOST=localhost`).
+2. Copy `dist/calling_parents-windows-amd64.exe` and `config.toml.example` to the ProPresenter Windows machine.
+3. Rename `config.toml.example` to `config.toml` and adjust values (typically `propresenter_host = "localhost"`).
 4. Optionally copy `run.bat` to the same directory for convenient startup.
 5. Run `calling_parents-windows-amd64.exe` (or `run.bat`).
 6. On the Android phone, open Chrome and navigate to `http://<server-ip>:8080`.

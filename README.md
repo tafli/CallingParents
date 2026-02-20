@@ -72,21 +72,23 @@ Produces binaries in `dist/`:
 ### 2. Configure
 
 ```bash
-cp .env-template .env
+cp config.toml.example config.toml
 ```
 
-Edit `.env` — at minimum, set the ProPresenter host if the server runs on a different machine:
+Edit `config.toml` — at minimum, set the ProPresenter host if the server runs on a different machine:
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `PROPRESENTER_HOST` | `localhost` | ProPresenter machine hostname/IP |
-| `PROPRESENTER_PORT` | `50001` | ProPresenter API port |
-| `LISTEN_ADDR` | `:8080` | Server listen address |
-| `CHILDREN_FILE` | `children.json` | Path to children names JSON file |
-| `MESSAGE_NAME` | `Eltern rufen` | ProPresenter message template name |
-| `AUTO_CLEAR_SECONDS` | `30` | Auto-clear after N seconds (0 = disabled) |
-| `ACTIVITY_LOG` | *(empty)* | Path to JSONL activity log (empty = disabled) |
-| `AUTH_TOKEN` | *(random)* | Fixed auth token (empty = generate on each startup) |
+| TOML key | Env override | Default | Description |
+|----------|-------------|---------|-------------|
+| `propresenter_host` | `PROPRESENTER_HOST` | `localhost` | ProPresenter machine hostname/IP |
+| `propresenter_port` | `PROPRESENTER_PORT` | `50001` | ProPresenter API port |
+| `listen_addr` | `LISTEN_ADDR` | `:8080` | Server listen address |
+| `children_file` | `CHILDREN_FILE` | `children.json` | Path to children names JSON file |
+| `message_name` | `MESSAGE_NAME` | `Eltern rufen` | ProPresenter message template name |
+| `auto_clear_seconds` | `AUTO_CLEAR_SECONDS` | `30` | Auto-clear after N seconds (0 = disabled) |
+| `activity_log` | `ACTIVITY_LOG` | *(empty)* | Path to JSONL activity log (empty = disabled) |
+| `auth_token` | `AUTH_TOKEN` | *(random)* | Fixed auth token (empty = generate on each startup) |
+
+Environment variables override TOML values when both are set (useful for Docker/CI).
 
 ### 3. Add Children
 
@@ -106,11 +108,11 @@ Names can also be managed in the PWA's settings view and are synced bidirectiona
 
 **Linux:**
 ```bash
-./run.sh          # loads .env, builds, and starts the server
+./run.sh          # builds and starts the server
 ```
 
 **Windows (ProPresenter machine):**
-1. Place the `.exe`, `.env`, `children.json`, and `run.bat` in a folder
+1. Place the `.exe`, `config.toml`, `children.json`, and `run.bat` in a folder
 2. Double-click `run.bat`
 
 The server prints a QR code in the terminal — scan it with the phone's camera to open and authenticate the PWA in one step.

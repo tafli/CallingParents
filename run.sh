@@ -3,14 +3,6 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-# Load .env if it exists
-if [[ -f .env ]]; then
-    echo "==> Loading .env"
-    set -a
-    source .env
-    set +a
-fi
-
 # Build first
 echo "==> Building for current platform..."
 gofmt -w .

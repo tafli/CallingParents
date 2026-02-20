@@ -48,6 +48,6 @@ google-services.json
 *.hprof
 
 # ---> Go / Project
-.env
+config.toml
 calling_parents
 dist/
