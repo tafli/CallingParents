@@ -21,7 +21,7 @@ func TestHandleSendSuccess(t *testing.T) {
 	}))
 	defer pp.Close()
 
-	h := New(pp.URL, "Eltern rufen", 0)
+	h := New(pp.URL, "Eltern rufen", 0, nil)
 
 	body := strings.NewReader(`{"name":"Paul"}`)
 	req := httptest.NewRequest(http.MethodPost, "/message/send", body)
@@ -47,7 +47,7 @@ func TestHandleSendSuccess(t *testing.T) {
 func TestHandleSendEmptyName(t *testing.T) {
 	t.Parallel()
 
-	h := New("http://localhost:1", "Eltern rufen", 0)
+	h := New("http://localhost:1", "Eltern rufen", 0, nil)
 
 	body := strings.NewReader(`{"name":"  "}`)
 	req := httptest.NewRequest(http.MethodPost, "/message/send", body)
@@ -64,7 +64,7 @@ func TestHandleSendEmptyName(t *testing.T) {
 func TestHandleSendRejectsGet(t *testing.T) {
 	t.Parallel()
 
-	h := New("http://localhost:1", "Eltern rufen", 0)
+	h := New("http://localhost:1", "Eltern rufen", 0, nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/message/send", nil)
 	rec := httptest.NewRecorder()
@@ -79,7 +79,7 @@ func TestHandleSendRejectsGet(t *testing.T) {
 func TestHandleSendProPresenterDown(t *testing.T) {
 	t.Parallel()
 
-	h := New("http://127.0.0.1:1", "Eltern rufen", 0)
+	h := New("http://127.0.0.1:1", "Eltern rufen", 0, nil)
 
 	body := strings.NewReader(`{"name":"Paul"}`)
 	req := httptest.NewRequest(http.MethodPost, "/message/send", body)
@@ -103,7 +103,7 @@ func TestHandleClearSuccess(t *testing.T) {
 	}))
 	defer pp.Close()
 
-	h := New(pp.URL, "Eltern rufen", 0)
+	h := New(pp.URL, "Eltern rufen", 0, nil)
 
 	req := httptest.NewRequest(http.MethodPost, "/message/clear", nil)
 	rec := httptest.NewRecorder()
@@ -123,7 +123,7 @@ func TestHandleClearSuccess(t *testing.T) {
 func TestHandleClearRejectsGet(t *testing.T) {
 	t.Parallel()
 
-	h := New("http://localhost:1", "Eltern rufen", 0)
+	h := New("http://localhost:1", "Eltern rufen", 0, nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/message/clear", nil)
 	rec := httptest.NewRecorder()
@@ -146,7 +146,7 @@ func TestHandleTestSuccess(t *testing.T) {
 	}))
 	defer pp.Close()
 
-	h := New(pp.URL, "Eltern rufen", 0)
+	h := New(pp.URL, "Eltern rufen", 0, nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/message/test", nil)
 	rec := httptest.NewRecorder()
@@ -166,7 +166,7 @@ func TestHandleTestSuccess(t *testing.T) {
 func TestHandleTestProPresenterDown(t *testing.T) {
 	t.Parallel()
 
-	h := New("http://127.0.0.1:1", "Eltern rufen", 0)
+	h := New("http://127.0.0.1:1", "Eltern rufen", 0, nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/message/test", nil)
 	rec := httptest.NewRecorder()
@@ -201,7 +201,7 @@ func TestEscapeJSON(t *testing.T) {
 func TestHandleConfigReturnsAutoClear(t *testing.T) {
 	t.Parallel()
 
-	h := New("http://localhost:1", "Eltern rufen", 45)
+	h := New("http://localhost:1", "Eltern rufen", 45, nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/message/config", nil)
 	rec := httptest.NewRecorder()
@@ -224,7 +224,7 @@ func TestHandleConfigReturnsAutoClear(t *testing.T) {
 func TestHandleConfigDisabled(t *testing.T) {
 	t.Parallel()
 
-	h := New("http://localhost:1", "Eltern rufen", 0)
+	h := New("http://localhost:1", "Eltern rufen", 0, nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/message/config", nil)
 	rec := httptest.NewRecorder()
@@ -243,7 +243,7 @@ func TestHandleConfigDisabled(t *testing.T) {
 func TestHandleConfigRejectsPost(t *testing.T) {
 	t.Parallel()
 
-	h := New("http://localhost:1", "Eltern rufen", 30)
+	h := New("http://localhost:1", "Eltern rufen", 30, nil)
 
 	req := httptest.NewRequest(http.MethodPost, "/message/config", nil)
 	rec := httptest.NewRecorder()

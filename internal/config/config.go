@@ -23,6 +23,9 @@ type Config struct {
 	// AutoClearSeconds is the number of seconds after which a sent message is
 	// automatically cleared. 0 disables auto-clear.
 	AutoClearSeconds int
+	// ActivityLog is the path to the activity log JSONL file.
+	// If empty, activity logging is disabled.
+	ActivityLog string
 }
 
 // Load reads configuration from environment variables with sensible defaults.
@@ -35,6 +38,7 @@ func Load() Config {
 		AuthToken:        os.Getenv("AUTH_TOKEN"),
 		MessageName:      getEnv("MESSAGE_NAME", "Eltern rufen"),
 		AutoClearSeconds: getEnvInt("AUTO_CLEAR_SECONDS", 30),
+		ActivityLog:      os.Getenv("ACTIVITY_LOG"),
 	}
 }
 

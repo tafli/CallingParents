@@ -10,6 +10,7 @@ import (
 
 	qrterminal "github.com/mdp/qrterminal/v3"
 
+	"github.com/calling-parents/calling-parents/internal/activitylog"
 	"github.com/calling-parents/calling-parents/internal/auth"
 	"github.com/calling-parents/calling-parents/internal/children"
 	"github.com/calling-parents/calling-parents/internal/config"
@@ -58,6 +59,18 @@ func main() {
 	})
 	fmt.Println()
 
+	// Activity logger (optional)
+	var logger *activitylog.Logger
+	if cfg.ActivityLog != "" {
+		var err error
+		logger, err = activitylog.New(cfg.ActivityLog)
+		if err != nil {
+			log.Fatalf("failed to open activity log: %v", err)
+		}
+		defer logger.Close()
+		log.Printf("Activity log: %s", cfg.ActivityLog)
+	}
+
 	// Children store
 	childStore, err := children.NewStore(cfg.ChildrenFile)
 	if err != nil {
@@ -71,7 +84,7 @@ func main() {
 	mux.Handle("/children", childStore)
 
 	// Message endpoints: send, clear, test connection
-	msgHandler := message.New(cfg.ProPresenterURL(), cfg.MessageName, cfg.AutoClearSeconds)
+	msgHandler := message.New(cfg.ProPresenterURL(), cfg.MessageName, cfg.AutoClearSeconds, logger)
 	mux.HandleFunc("/message/send", msgHandler.HandleSend)
 	mux.HandleFunc("/message/clear", msgHandler.HandleClear)
 	mux.HandleFunc("/message/test", msgHandler.HandleTest)

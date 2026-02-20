@@ -76,6 +76,7 @@ run.bat
 | `CHILDREN_FILE` | `children.json` | Path to children names JSON file |
 | `MESSAGE_NAME` | `Eltern rufen` | ProPresenter message template name |
 | `AUTO_CLEAR_SECONDS` | `30` | Auto-clear message after N seconds (0 = disabled) |
+| `ACTIVITY_LOG` | *(empty)* | Path to JSONL activity log file (empty = disabled) |
 
 ## Usage
 
@@ -118,6 +119,7 @@ internal/
   config/              — Configuration from environment variables
   network/             — LAN IP detection for QR code
   message/             — ProPresenter message send/clear/test handlers
+  activitylog/         — Append-only JSONL activity logger
 docs/architecture/     — Architecture Decision Records
 children.json.example  — Example children names file
 ```

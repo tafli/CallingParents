@@ -8,6 +8,8 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/calling-parents/calling-parents/internal/activitylog"
 )
 
 // Handler provides HTTP endpoints that proxy message operations to ProPresenter.
@@ -17,16 +19,18 @@ type Handler struct {
 	messageName      string
 	autoClearSeconds int
 	client           *http.Client
+	logger           *activitylog.Logger
 }
 
 // New creates a Handler that talks to ProPresenter at the given base URL
 // using the given message template name.
-func New(proPresenterURL, messageName string, autoClearSeconds int) *Handler {
+func New(proPresenterURL, messageName string, autoClearSeconds int, logger *activitylog.Logger) *Handler {
 	return &Handler{
 		proPresenterURL:  strings.TrimRight(proPresenterURL, "/"),
 		messageName:      messageName,
 		autoClearSeconds: autoClearSeconds,
 		client:           &http.Client{Timeout: 10 * time.Second},
+		logger:           logger,
 	}
 }
 
@@ -81,6 +85,7 @@ func (h *Handler) HandleSend(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	h.logger.Log("send", name)
 	w.WriteHeader(http.StatusNoContent)
 }
 
@@ -115,6 +120,7 @@ func (h *Handler) HandleClear(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	h.logger.Log("clear", "")
 	w.WriteHeader(http.StatusNoContent)
 }
 
