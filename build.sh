@@ -8,7 +8,8 @@ VERSION="${VERSION:-$(git describe --tags --always --dirty 2>/dev/null || echo "
 COMMIT="${COMMIT:-$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")}"
 DATE="${DATE:-$(date -u +%Y-%m-%dT%H:%M:%SZ)}"
 
-LDFLAGS="-X github.com/tafli/calling-parents/internal/version.Version=${VERSION}"
+LDFLAGS="-s -w"
+LDFLAGS+=" -X github.com/tafli/calling-parents/internal/version.Version=${VERSION}"
 LDFLAGS+=" -X github.com/tafli/calling-parents/internal/version.Commit=${COMMIT}"
 LDFLAGS+=" -X github.com/tafli/calling-parents/internal/version.Date=${DATE}"
 
@@ -39,6 +40,12 @@ cp config.toml.example dist/
 cp children.json.example dist/
 cp run.bat dist/
 
+echo "==> Generating checksums..."
+(cd dist/ && sha256sum calling_parents-linux-amd64 calling_parents-windows-amd64.exe > checksums.txt)
+
 echo ""
 echo "==> Build complete:"
 ls -lh dist/
+echo ""
+echo "==> Checksums:"
+cat dist/checksums.txt
