@@ -31,16 +31,20 @@ Use a **server-side `children.json` file** as the source of truth for the childr
 
 1. Admin creates/edits `children.json` next to the server binary (a JSON array of strings).
 2. On startup, the server loads and sorts the file.
-3. The PWA calls `GET /children` on every load.
-4. Server names not already in localStorage are added (merge, not replace).
-5. Workers can add names via the settings screen — these are saved locally **and** sent to the server via `POST /children` so all devices share the same list.
+3. The PWA calls `GET /children` on every load (or when the user taps "Reload from server").
+4. **`GET /children` re-reads the file from disk on every request**, so manual edits to `children.json` are picked up immediately — no server restart needed.
+5. Server names not already in localStorage are added (merge, not replace).
+6. Workers can add names via the settings screen — these are saved locally **and** sent to the server via `POST /children` so all devices share the same list.
 
 ### API
 
 | Method | Path | Body | Description |
 |--------|------|------|-------------|
-| `GET` | `/children` | — | Returns the current names as a JSON array. |
-| `POST` | `/children` | `{"name":"..."}` | Adds a name to the server list and persists to `children.json`. Returns `201` with updated list, or `200` if the name already exists. |
+| `GET` | `/children` | — | Re-reads `children.json` from disk and returns the sorted names as a JSON array. |
+| `POST` | `/children` | `{"name":"..."}` | Adds a name to the server list (sorted, persisted to `children.json`). Returns `201` with updated list, or `200` if the name already exists. |
+| `DELETE` | `/children` | `{"name":"..."}` | Removes a name from the server list and persists. Returns `200` with updated list. If the name does not exist, returns `200` with the unchanged list. |
+
+The `Store` type implements `http.Handler` directly and dispatches by HTTP method. It is concurrency-safe (`sync.RWMutex`). On save failure, the in-memory list is rolled back by re-reading the file.
 
 ### `children.json` Format
 

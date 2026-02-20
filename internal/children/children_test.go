@@ -374,3 +374,39 @@ func TestNamesReturnsCopy(t *testing.T) {
 		t.Error("Names() did not return a copy — mutation affected the store")
 	}
 }
+
+func TestServeHTTPGetPicksUpExternalEdits(t *testing.T) {
+	t.Parallel()
+
+	dir := t.TempDir()
+	path := filepath.Join(dir, "children.json")
+	os.WriteFile(path, []byte(`["Anna","Ben"]`), 0644)
+
+	s, err := NewStore(path)
+	if err != nil {
+		t.Fatalf("NewStore() error: %v", err)
+	}
+
+	// Externally modify the file (simulates manual edit).
+	os.WriteFile(path, []byte(`["Anna","Ben","Clara","David"]`), 0644)
+
+	req := httptest.NewRequest(http.MethodGet, "/children", nil)
+	rec := httptest.NewRecorder()
+	s.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("expected status 200, got %d", rec.Code)
+	}
+
+	var names []string
+	json.NewDecoder(rec.Body).Decode(&names)
+	if len(names) != 4 {
+		t.Fatalf("expected 4 names after external edit, got %d: %v", len(names), names)
+	}
+	expected := []string{"Anna", "Ben", "Clara", "David"}
+	for i, want := range expected {
+		if names[i] != want {
+			t.Errorf("names[%d] = %q, want %q", i, names[i], want)
+		}
+	}
+}

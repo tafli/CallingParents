@@ -23,7 +23,7 @@ When a child in the nursery or kids' area needs their parents, tap their name an
 - **Cross-platform server** — pre-built for Linux and Windows (runs on the ProPresenter machine or any PC on the network)
 - **Bearer token authentication** — simple but effective, prevents unauthorized access on the local network
 - **Activity logging** — optional JSONL log of all send/clear events with timestamps
-- **Server-side children list** — manage names via a JSON file, synced to all connected devices
+- **Server-side children list** — manage names via a JSON file, synced to all connected devices; manual edits are picked up instantly without restart
 - **Haptic feedback** — vibration on send for tactile confirmation
 - **Zero external dependencies in the frontend** — no frameworks, no build tools, just HTML/CSS/JS
 

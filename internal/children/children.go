@@ -55,9 +55,15 @@ func (s *Store) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Store) handleGet(w http.ResponseWriter, _ *http.Request) {
-	s.mu.RLock()
+	// Re-read from disk so manual edits to children.json are picked up.
+	s.mu.Lock()
+	if err := s.load(); err != nil {
+		s.mu.Unlock()
+		http.Error(w, "failed to read children file", http.StatusInternalServerError)
+		return
+	}
 	names := s.names
-	s.mu.RUnlock()
+	s.mu.Unlock()
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(names); err != nil {
