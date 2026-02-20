@@ -10,13 +10,13 @@ import (
 
 	qrterminal "github.com/mdp/qrterminal/v3"
 
-	"github.com/calling-parents/calling-parents/internal/activitylog"
-	"github.com/calling-parents/calling-parents/internal/auth"
-	"github.com/calling-parents/calling-parents/internal/children"
-	"github.com/calling-parents/calling-parents/internal/config"
-	"github.com/calling-parents/calling-parents/internal/message"
-	"github.com/calling-parents/calling-parents/internal/network"
-	"github.com/calling-parents/calling-parents/internal/version"
+	"github.com/tafli/calling-parents/internal/activitylog"
+	"github.com/tafli/calling-parents/internal/auth"
+	"github.com/tafli/calling-parents/internal/children"
+	"github.com/tafli/calling-parents/internal/config"
+	"github.com/tafli/calling-parents/internal/message"
+	"github.com/tafli/calling-parents/internal/network"
+	"github.com/tafli/calling-parents/internal/version"
 )
 
 //go:embed all:web
@@ -54,11 +54,14 @@ func main() {
 	fmt.Println(lanURL)
 	fmt.Println()
 	qrterminal.GenerateWithConfig(lanURL, qrterminal.Config{
-		Level:     qrterminal.L,
-		Writer:    os.Stdout,
-		BlackChar: qrterminal.BLACK,
-		WhiteChar: qrterminal.WHITE,
-		QuietZone: 1,
+		Level:          qrterminal.L,
+		Writer:         os.Stdout,
+		HalfBlocks:     true,
+		BlackChar:      qrterminal.BLACK_BLACK,
+		WhiteBlackChar: qrterminal.WHITE_BLACK,
+		WhiteChar:      qrterminal.WHITE_WHITE,
+		BlackWhiteChar: qrterminal.BLACK_WHITE,
+		QuietZone:      1,
 	})
 	fmt.Println()
 

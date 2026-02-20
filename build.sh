@@ -8,9 +8,9 @@ VERSION="${VERSION:-$(git describe --tags --always --dirty 2>/dev/null || echo "
 COMMIT="${COMMIT:-$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")}"
 DATE="${DATE:-$(date -u +%Y-%m-%dT%H:%M:%SZ)}"
 
-LDFLAGS="-X github.com/calling-parents/calling-parents/internal/version.Version=${VERSION}"
-LDFLAGS+=" -X github.com/calling-parents/calling-parents/internal/version.Commit=${COMMIT}"
-LDFLAGS+=" -X github.com/calling-parents/calling-parents/internal/version.Date=${DATE}"
+LDFLAGS="-X github.com/tafli/calling-parents/internal/version.Version=${VERSION}"
+LDFLAGS+=" -X github.com/tafli/calling-parents/internal/version.Commit=${COMMIT}"
+LDFLAGS+=" -X github.com/tafli/calling-parents/internal/version.Date=${DATE}"
 
 echo "==> Version: ${VERSION} (${COMMIT}) ${DATE}"
 echo ""

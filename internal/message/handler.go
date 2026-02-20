@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/calling-parents/calling-parents/internal/activitylog"
+	"github.com/tafli/calling-parents/internal/activitylog"
 )
 
 // Handler provides HTTP endpoints that proxy message operations to ProPresenter.
