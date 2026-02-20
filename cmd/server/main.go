@@ -2,11 +2,16 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"io/fs"
 	"log"
 	"net/http"
+	"os"
+
+	qrterminal "github.com/mdp/qrterminal/v3"
 
 	"github.com/calling-parents/calling-parents/internal/config"
+	"github.com/calling-parents/calling-parents/internal/network"
 	"github.com/calling-parents/calling-parents/internal/proxy"
 )
 
@@ -16,8 +21,23 @@ var webFS embed.FS
 func main() {
 	cfg := config.Load()
 
+	lanURL := network.LanURL(cfg.ListenAddr)
+
 	log.Printf("ProPresenter API: %s", cfg.ProPresenterURL())
 	log.Printf("Listening on %s", cfg.ListenAddr)
+
+	fmt.Println()
+	fmt.Println("Open this URL on the phone:")
+	fmt.Println(lanURL)
+	fmt.Println()
+	qrterminal.GenerateWithConfig(lanURL, qrterminal.Config{
+		Level:     qrterminal.L,
+		Writer:    os.Stdout,
+		BlackChar: qrterminal.BLACK,
+		WhiteChar: qrterminal.WHITE,
+		QuietZone: 1,
+	})
+	fmt.Println()
 
 	mux := http.NewServeMux()
 
