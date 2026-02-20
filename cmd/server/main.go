@@ -10,6 +10,7 @@ import (
 
 	qrterminal "github.com/mdp/qrterminal/v3"
 
+	"github.com/calling-parents/calling-parents/internal/children"
 	"github.com/calling-parents/calling-parents/internal/config"
 	"github.com/calling-parents/calling-parents/internal/network"
 	"github.com/calling-parents/calling-parents/internal/proxy"
@@ -39,7 +40,17 @@ func main() {
 	})
 	fmt.Println()
 
+	// Children store
+	childStore, err := children.NewStore(cfg.ChildrenFile)
+	if err != nil {
+		log.Fatalf("failed to load children: %v", err)
+	}
+	log.Printf("Loaded %d children from %s", len(childStore.Names()), cfg.ChildrenFile)
+
 	mux := http.NewServeMux()
+
+	// Children endpoint
+	mux.Handle("/children", childStore)
 
 	// API proxy: /api/* -> ProPresenter
 	apiProxy := proxy.New(cfg.ProPresenterURL())

@@ -1,8 +1,8 @@
-# ADR-004: Data Management — Browser localStorage
+# ADR-004: Data Management — Server-Side Children File + Browser localStorage
 
 ## Status
 
-Accepted
+Accepted (updated)
 
 ## Date
 
@@ -15,43 +15,55 @@ The application needs to store:
 1. A list of children's names (for quick selection buttons).
 2. Connection settings (ProPresenter message ID).
 
-The data set is small (tens of names, a few settings), device-local, and does not need to be shared across devices or persisted on a server.
+The children list should be centrally managed so that all phones receive the same predefined set of names without manual entry.
 
 ### Options Considered
 
-1. **Server-side database** (SQLite, PostgreSQL) — provides persistence and multi-device access, but adds complexity, a database dependency, and server state management.
-2. **Server-side file storage** (JSON file) — simpler than a DB but still requires server-side state and API endpoints for CRUD.
-3. **Browser localStorage** — built into every browser, synchronous key-value storage, persists across sessions, no server dependency.
+1. **QR code with embedded data** — limited to ~4 KB, requires re-scanning on every change, no auto-sync.
+2. **Server-side database** — overkill for a simple name list.
+3. **Server-side JSON file + browser localStorage** — admin edits a `children.json` file next to the binary; the server serves it via `GET /children`; the PWA fetches and merges on startup, using localStorage as a local cache.
 
 ## Decision
 
-Store all application data in the browser's **localStorage**.
+Use a **server-side `children.json` file** as the source of truth for the children list. The PWA merges the server list into localStorage on every load. Settings remain in localStorage only.
 
-### Data Model
+### Data Flow
+
+1. Admin creates/edits `children.json` next to the server binary (a JSON array of strings).
+2. On startup, the server loads and sorts the file.
+3. The PWA calls `GET /children` on every load.
+4. Server names not already in localStorage are added (merge, not replace).
+5. Workers can still add names locally via the settings screen for ad-hoc children.
+
+### `children.json` Format
 
 ```json
-{
-  "children": ["Anna", "Ben", "Clara", "David", "Emma"],
-  "settings": {
-    "messageId": "Eltern rufen"
-  }
-}
+[
+    "Anna",
+    "Ben",
+    "Clara"
+]
 ```
 
-- `children` — array of strings, sorted alphabetically for display.
-- `settings.messageId` — the ProPresenter message name, UUID, or index to trigger.
+If the file does not exist, the server starts with an empty list and the PWA falls back to localStorage only.
 
-### Storage Keys
+### Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `CHILDREN_FILE` | `children.json` | Path to the children names JSON file |
+
+### localStorage Keys
 
 | Key | Type | Description |
 |-----|------|-------------|
-| `calling_parents_children` | JSON string[] | List of registered children's names |
+| `calling_parents_children` | JSON string[] | Merged children list (server + local additions) |
 | `calling_parents_settings` | JSON object | App configuration (message ID) |
 
 ## Consequences
 
-- **No server-side state**: the Go server is stateless, serving only static files and proxying API calls. This simplifies deployment and eliminates database maintenance.
-- **Device-local**: data is tied to the specific browser on the specific device. If the phone is replaced, settings and child names must be re-entered. This is acceptable given the small data set.
-- **No sync**: if multiple devices are used, each maintains its own child list. This is acceptable for the single-phone setup at child care.
-- **Storage limits**: localStorage provides ~5–10 MB, far more than needed for this use case.
-- **Data loss risk**: clearing browser data erases the child list. This is mitigated by the list being easy to re-create and by using Chrome's "installed PWA" mode which has separate storage.
+- **Central management**: the admin edits one file; all phones auto-sync on next load.
+- **Merge strategy**: server names are additive — they never remove locally-added names. This lets workers add ad-hoc children while keeping the server list as the base.
+- **Offline resilience**: if the server is unreachable, the PWA uses the cached localStorage list.
+- **Near-stateless server**: the only server-side state is a read-only JSON file. No database, no write endpoints.
+- **Easy reset**: deleting localStorage on the phone reverts to the server-provided list on next load.

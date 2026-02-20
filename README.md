@@ -27,6 +27,10 @@ All architecture decisions are documented as ADRs in [`docs/architecture/`](docs
   - Theme: your preferred slide design
 - The **Messages layer** enabled in the active Look for the audience screen(s)
 - **Go 1.22+** installed for building
+- A **`children.json`** file with the children's names (see `children.json.example`):
+  ```json
+  ["Anna", "Ben", "Clara"]
+  ```
 
 ## Build
 
@@ -54,9 +58,10 @@ cp .env-template .env   # adjust values
 
 ### On Windows (ProPresenter machine)
 
-1. Copy `calling_parents-windows-amd64.exe`, `.env-template`, and `run.bat` to a folder.
+1. Copy `calling_parents-windows-amd64.exe`, `.env-template`, `children.json.example`, and `run.bat` to a folder.
 2. Rename `.env-template` to `.env` and adjust values.
-3. Double-click `run.bat` — or run the `.exe` directly.
+3. Copy `children.json.example` to `children.json` and edit the names.
+4. Double-click `run.bat` — or run the `.exe` directly.
 
 ```bat
 run.bat
@@ -67,6 +72,7 @@ run.bat
 | `PROPRESENTER_HOST` | `localhost` | ProPresenter machine hostname/IP |
 | `PROPRESENTER_PORT` | `50001` | ProPresenter API port |
 | `LISTEN_ADDR` | `:8080` | Server listen address |
+| `CHILDREN_FILE` | `children.json` | Path to children names JSON file |
 
 ## Usage
 
@@ -106,7 +112,10 @@ cmd/server/
     sw.js              — Service worker
     icons/             — App icons
 internal/
+  children/            — Loads children names from JSON file, serves GET /children
   config/              — Configuration from environment variables
+  network/             — LAN IP detection for QR code
   proxy/               — Reverse proxy to ProPresenter API
 docs/architecture/     — Architecture Decision Records
+children.json.example  — Example children names file
 ```

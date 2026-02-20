@@ -33,6 +33,9 @@ function init() {
     renderChildrenList();
     settingMessageId.value = settings.messageId;
 
+    // Fetch server-side children list, then merge
+    fetchServerChildren();
+
     // Event listeners
     btnSettings.addEventListener("click", showSettings);
     btnBack.addEventListener("click", showMain);
@@ -76,6 +79,34 @@ function saveChildren() {
 
 function saveSettings() {
     localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
+}
+
+// === Server Children Sync ===
+async function fetchServerChildren() {
+    try {
+        const resp = await fetch("/children");
+        if (!resp.ok) return;
+
+        const serverNames = await resp.json();
+        if (!Array.isArray(serverNames) || serverNames.length === 0) return;
+
+        // Merge: add server names not already in the local list
+        let changed = false;
+        for (const name of serverNames) {
+            if (!children.includes(name)) {
+                children.push(name);
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            saveChildren();
+            renderChildrenGrid();
+            renderChildrenList();
+        }
+    } catch (_) {
+        // Offline or server unreachable — keep local list
+    }
 }
 
 // === View Switching ===

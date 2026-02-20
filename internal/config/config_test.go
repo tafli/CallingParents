@@ -10,6 +10,7 @@ func TestLoadDefaults(t *testing.T) {
 	os.Unsetenv("PROPRESENTER_HOST")
 	os.Unsetenv("PROPRESENTER_PORT")
 	os.Unsetenv("LISTEN_ADDR")
+	os.Unsetenv("CHILDREN_FILE")
 
 	cfg := Load()
 
@@ -21,6 +22,9 @@ func TestLoadDefaults(t *testing.T) {
 	}
 	if cfg.ListenAddr != ":8080" {
 		t.Errorf("expected ListenAddr=:8080, got %s", cfg.ListenAddr)
+	}
+	if cfg.ChildrenFile != "children.json" {
+		t.Errorf("expected ChildrenFile=children.json, got %s", cfg.ChildrenFile)
 	}
 }
 

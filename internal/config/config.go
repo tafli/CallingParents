@@ -10,6 +10,8 @@ type Config struct {
 	ProPresenterPort string
 	// ListenAddr is the address the server listens on (default :8080).
 	ListenAddr string
+	// ChildrenFile is the path to the JSON file containing children's names.
+	ChildrenFile string
 }
 
 // Load reads configuration from environment variables with sensible defaults.
@@ -18,6 +20,7 @@ func Load() Config {
 		ProPresenterHost: getEnv("PROPRESENTER_HOST", "localhost"),
 		ProPresenterPort: getEnv("PROPRESENTER_PORT", "50001"),
 		ListenAddr:       getEnv("LISTEN_ADDR", ":8080"),
+		ChildrenFile:     getEnv("CHILDREN_FILE", "children.json"),
 	}
 }
 
