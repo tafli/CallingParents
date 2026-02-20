@@ -48,6 +48,7 @@ const connectionStatus = document.getElementById("connection-status");
 const inputAddChild = document.getElementById("input-add-child");
 const btnAddChild = document.getElementById("btn-add-child");
 const childrenList = document.getElementById("children-list");
+const btnReloadChildren = document.getElementById("btn-reload-children");
 const toast = document.getElementById("toast");
 const headerTitle = document.getElementById("header-title");
 
@@ -69,6 +70,7 @@ function init() {
     btnClear.addEventListener("click", clearMessage);
     btnTestConnection.addEventListener("click", testConnection);
     btnAddChild.addEventListener("click", addChild);
+    btnReloadChildren.addEventListener("click", reloadChildren);
     inputName.addEventListener("input", onNameInput);
     inputName.addEventListener("keydown", (e) => {
         if (e.key === "Enter" && inputName.value.trim()) sendMessage();
@@ -134,6 +136,33 @@ async function fetchServerChildren() {
         }
     } catch (_) {
         // Offline or server unreachable — keep local list
+    }
+}
+
+// Full replace of local list with server list.
+async function reloadChildren() {
+    try {
+        const resp = await fetch("/children", {
+            headers: authHeaders(),
+        });
+        if (!resp.ok) {
+            showToast("Serverliste konnte nicht geladen werden", "error");
+            return;
+        }
+
+        const serverNames = await resp.json();
+        if (!Array.isArray(serverNames)) {
+            showToast("Ungültige Antwort vom Server", "error");
+            return;
+        }
+
+        children = serverNames;
+        saveChildren();
+        renderChildrenGrid();
+        renderChildrenList();
+        showToast(`${children.length} Namen vom Server geladen`, "success");
+    } catch (_) {
+        showToast("Server nicht erreichbar", "error");
     }
 }
 
@@ -231,9 +260,21 @@ function addChild() {
 }
 
 function removeChild(index) {
+    const name = children[index];
     children.splice(index, 1);
     saveChildren();
     renderChildrenList();
+
+    // Sync deletion to server (fire-and-forget).
+    if (name) {
+        fetch("/children", {
+            method: "DELETE",
+            headers: authHeaders({ "Content-Type": "application/json" }),
+            body: JSON.stringify({ name }),
+        }).catch(() => {
+            // Server sync is best-effort.
+        });
+    }
 }
 
 // === ProPresenter API ===

@@ -201,7 +201,103 @@ func TestServeHTTPPostEmptyName(t *testing.T) {
 	}
 }
 
-func TestServeHTTPRejectsDelete(t *testing.T) {
+func TestServeHTTPDeleteRemovesName(t *testing.T) {
+	t.Parallel()
+
+	dir := t.TempDir()
+	path := filepath.Join(dir, "children.json")
+	os.WriteFile(path, []byte(`["Anna","Ben","Clara"]`), 0644)
+
+	s, err := NewStore(path)
+	if err != nil {
+		t.Fatalf("NewStore() error: %v", err)
+	}
+
+	body := strings.NewReader(`{"name":"Ben"}`)
+	req := httptest.NewRequest(http.MethodDelete, "/children", body)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	s.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("expected status 200, got %d", rec.Code)
+	}
+
+	var names []string
+	json.NewDecoder(rec.Body).Decode(&names)
+	if len(names) != 2 {
+		t.Fatalf("expected 2 names, got %d: %v", len(names), names)
+	}
+	if names[0] != "Anna" || names[1] != "Clara" {
+		t.Errorf("unexpected names: %v", names)
+	}
+
+	// Verify file was updated on disk.
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("reading file: %v", err)
+	}
+	var persisted []string
+	json.Unmarshal(data, &persisted)
+	if len(persisted) != 2 {
+		t.Fatalf("expected 2 persisted names, got %d", len(persisted))
+	}
+}
+
+func TestServeHTTPDeleteNonexistent(t *testing.T) {
+	t.Parallel()
+
+	dir := t.TempDir()
+	path := filepath.Join(dir, "children.json")
+	os.WriteFile(path, []byte(`["Anna","Ben"]`), 0644)
+
+	s, err := NewStore(path)
+	if err != nil {
+		t.Fatalf("NewStore() error: %v", err)
+	}
+
+	body := strings.NewReader(`{"name":"Unknown"}`)
+	req := httptest.NewRequest(http.MethodDelete, "/children", body)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	s.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("expected status 200 for nonexistent name, got %d", rec.Code)
+	}
+
+	if len(s.Names()) != 2 {
+		t.Errorf("expected 2 names unchanged, got %d", len(s.Names()))
+	}
+}
+
+func TestServeHTTPDeleteEmptyName(t *testing.T) {
+	t.Parallel()
+
+	dir := t.TempDir()
+	path := filepath.Join(dir, "children.json")
+	os.WriteFile(path, []byte(`["Anna"]`), 0644)
+
+	s, err := NewStore(path)
+	if err != nil {
+		t.Fatalf("NewStore() error: %v", err)
+	}
+
+	body := strings.NewReader(`{"name":""}`)
+	req := httptest.NewRequest(http.MethodDelete, "/children", body)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	s.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusBadRequest {
+		t.Errorf("expected status 400 for empty name, got %d", rec.Code)
+	}
+}
+
+func TestServeHTTPRejectsPut(t *testing.T) {
 	t.Parallel()
 
 	dir := t.TempDir()
@@ -213,7 +309,7 @@ func TestServeHTTPRejectsDelete(t *testing.T) {
 		t.Fatalf("NewStore() error: %v", err)
 	}
 
-	req := httptest.NewRequest(http.MethodDelete, "/children", nil)
+	req := httptest.NewRequest(http.MethodPut, "/children", nil)
 	rec := httptest.NewRecorder()
 
 	s.ServeHTTP(rec, req)

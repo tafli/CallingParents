@@ -37,15 +37,18 @@ func (s *Store) Names() []string {
 	return out
 }
 
-// ServeHTTP handles GET /children and POST /children.
+// ServeHTTP handles GET, POST, and DELETE /children.
 // GET returns the names as a JSON array.
 // POST accepts {"name":"..."} and adds the name to the list, persisting to disk.
+// DELETE accepts {"name":"..."} and removes the name from the list, persisting to disk.
 func (s *Store) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		s.handleGet(w, r)
 	case http.MethodPost:
 		s.handlePost(w, r)
+	case http.MethodDelete:
+		s.handleDelete(w, r)
 	default:
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 	}
@@ -107,6 +110,56 @@ func (s *Store) handlePost(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(s.names)
+}
+
+// deleteRequest is the expected JSON body for DELETE /children.
+type deleteRequest struct {
+	Name string `json:"name"`
+}
+
+func (s *Store) handleDelete(w http.ResponseWriter, r *http.Request) {
+	var req deleteRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "invalid JSON body", http.StatusBadRequest)
+		return
+	}
+
+	name := strings.TrimSpace(req.Name)
+	if name == "" {
+		http.Error(w, "name must not be empty", http.StatusBadRequest)
+		return
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	idx := -1
+	for i, existing := range s.names {
+		if existing == name {
+			idx = i
+			break
+		}
+	}
+
+	if idx == -1 {
+		// Name not found — return current list.
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(s.names)
+		return
+	}
+
+	s.names = append(s.names[:idx], s.names[idx+1:]...)
+
+	if err := s.save(); err != nil {
+		s.load()
+		http.Error(w, "failed to persist deletion", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(s.names)
 }
 
