@@ -1,5 +1,5 @@
-const CACHE_NAME = "calling-parents-v3";
-const ASSETS = ["/", "/index.html", "/css/style.css", "/js/i18n.js", "/js/app.js", "/manifest.json"];
+const CACHE_NAME = "calling-parents-v4";
+const ASSETS = ["/", "/index.html", "/css/style.css", "/js/i18n.js", "/js/app.js", "/manifest.json", "/lang/de.json", "/lang/en.json"];
 
 // Install: cache app shell
 self.addEventListener("install", (event) => {

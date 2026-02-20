@@ -1,0 +1,48 @@
+{
+    "app.title": "Call Parents",
+    "app.description": "Call parents via ProPresenter",
+
+    "header.settings": "Settings",
+    "header.statusDot": "Connection status",
+
+    "connection.banner": "⚠ ProPresenter not reachable",
+    "input.placeholder": "Enter name…",
+    "input.clearLabel": "Clear input",
+    "btn.send": "Send",
+
+    "settings.title": "Settings",
+    "settings.connection": "Connection",
+    "settings.testConnection": "Test connection",
+    "settings.manageChildren": "Manage children",
+    "settings.addPlaceholder": "Add name…",
+    "settings.reloadFromServer": "Reload list from server",
+    "settings.back": "Back",
+    "settings.language": "Language",
+
+    "connection.testing": "Testing connection…",
+    "connection.success": "Connected — {count} message(s) found",
+    "connection.failed": "Connection failed: {error}",
+    "connection.connected": "ProPresenter connected",
+    "connection.disconnected": "ProPresenter not reachable",
+
+    "toast.sent": "Message sent: {name} ✓",
+    "toast.sendFailed": "Error: {error}",
+    "toast.cleared": "Message cleared",
+    "toast.autoCleared": "Message auto-cleared",
+    "toast.autoClearFailed": "Auto-clear failed: {error}",
+    "toast.childExists": "\"{name}\" already exists",
+    "toast.serverListLoaded": "{count} names loaded from server",
+    "toast.serverListFailed": "Could not load server list",
+    "toast.serverInvalidResponse": "Invalid server response",
+    "toast.serverUnreachable": "Server not reachable",
+
+    "status.showing": "Showing: \"Parents of {name}\"",
+    "status.sendFailed": "Send failed",
+
+    "auth.title": "Not authorized",
+    "auth.message": "Please scan the QR code again to get access.",
+
+    "aria.removeChild": "Remove {name}",
+
+    "grid.empty": "No children added. Open settings (⚙) to add names."
+}

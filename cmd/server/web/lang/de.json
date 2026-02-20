@@ -1,0 +1,48 @@
+{
+    "app.title": "Eltern rufen",
+    "app.description": "Eltern über ProPresenter aufrufen",
+
+    "header.settings": "Einstellungen",
+    "header.statusDot": "Verbindungsstatus",
+
+    "connection.banner": "⚠ ProPresenter nicht erreichbar",
+    "input.placeholder": "Name eingeben…",
+    "input.clearLabel": "Eingabe löschen",
+    "btn.send": "Senden",
+
+    "settings.title": "Einstellungen",
+    "settings.connection": "Verbindung",
+    "settings.testConnection": "Verbindung testen",
+    "settings.manageChildren": "Kinder verwalten",
+    "settings.addPlaceholder": "Name hinzufügen…",
+    "settings.reloadFromServer": "Liste vom Server laden",
+    "settings.back": "Zurück",
+    "settings.language": "Sprache",
+
+    "connection.testing": "Teste Verbindung…",
+    "connection.success": "Verbunden — {count} Nachricht(en) gefunden",
+    "connection.failed": "Verbindung fehlgeschlagen: {error}",
+    "connection.connected": "ProPresenter verbunden",
+    "connection.disconnected": "ProPresenter nicht erreichbar",
+
+    "toast.sent": "Nachricht gesendet: {name} ✓",
+    "toast.sendFailed": "Fehler: {error}",
+    "toast.cleared": "Nachricht gelöscht",
+    "toast.autoCleared": "Nachricht automatisch gelöscht",
+    "toast.autoClearFailed": "Auto-Löschen fehlgeschlagen: {error}",
+    "toast.childExists": "\"{name}\" ist bereits vorhanden",
+    "toast.serverListLoaded": "{count} Namen vom Server geladen",
+    "toast.serverListFailed": "Serverliste konnte nicht geladen werden",
+    "toast.serverInvalidResponse": "Ungültige Antwort vom Server",
+    "toast.serverUnreachable": "Server nicht erreichbar",
+
+    "status.showing": "Anzeige: \"Eltern von {name}\"",
+    "status.sendFailed": "Senden fehlgeschlagen",
+
+    "auth.title": "Nicht autorisiert",
+    "auth.message": "Bitte scanne den QR-Code erneut, um Zugang zu erhalten.",
+
+    "aria.removeChild": "{name} entfernen",
+
+    "grid.empty": "Keine Kinder eingetragen. Öffne die Einstellungen (⚙), um Namen hinzuzufügen."
+}

@@ -29,7 +29,7 @@ A PWA served by a Go binary that lets church child care workers send "Eltern von
 - **`cmd/server/main.go`** — HTTP server entry point; embeds `web/` via `embed.FS`, mounts the reverse proxy on `/api/` and the file server on `/`.
 - **`internal/config/`** — Reads `PROPRESENTER_HOST`, `PROPRESENTER_PORT`, `LISTEN_ADDR` from environment variables.
 - **`internal/proxy/`** — `httputil.ReverseProxy` that strips `/api` prefix and forwards to ProPresenter.
-- **`cmd/server/web/`** — PWA frontend: `index.html`, `manifest.json`, `sw.js`, `js/` (app.js, i18n.js), `css/` (style.css), `icons/`.
+- **`cmd/server/web/`** — PWA frontend: `index.html`, `manifest.json`, `sw.js`, `js/` (app.js, i18n.js), `css/` (style.css), `lang/` (de.json, en.json), `icons/`.
 
 ### ProPresenter API endpoints used
 

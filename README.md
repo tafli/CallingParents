@@ -113,9 +113,12 @@ cmd/server/
     sw.js              — Service worker
     js/
       app.js           — Application logic
-      i18n.js          — Internationalization (de, en)
+      i18n.js          — Internationalization module
     css/
       style.css        — Mobile-first styles
+    lang/              — Translation files
+      de.json          — German
+      en.json          — English
     icons/             — App icons
 internal/
   children/            — Loads children names from JSON file, serves GET /children

@@ -69,8 +69,8 @@ const statusDot = document.getElementById("status-dot");
 const btnClearInput = document.getElementById("btn-clear-input");
 
 // === Initialization ===
-function init() {
-    initI18n();
+async function init() {
+    await initI18n();
     applyI18nToDOM();
     initToken();
 
@@ -546,8 +546,8 @@ function renderLanguagePicker() {
         const btn = document.createElement("button");
         btn.textContent = label;
         btn.className = "btn" + (code === currentLang ? " active" : "");
-        btn.addEventListener("click", () => {
-            setLanguage(code);
+        btn.addEventListener("click", async () => {
+            await setLanguage(code);
             applyI18nToDOM();
             renderChildrenGrid();
             renderChildrenList();
