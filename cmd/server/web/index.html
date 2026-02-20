@@ -29,7 +29,10 @@
         </section>
 
         <section class="input-section">
-            <input type="text" id="input-name" placeholder="Name eingeben…" autocomplete="off">
+            <div class="input-wrapper">
+                <input type="text" id="input-name" placeholder="Name eingeben…" autocomplete="off">
+                <button id="btn-clear-input" class="input-clear-btn hidden" type="button" aria-label="Eingabe löschen">×</button>
+            </div>
             <div class="action-buttons">
                 <button id="btn-send" class="btn btn-primary" disabled>Senden</button>
             </div>

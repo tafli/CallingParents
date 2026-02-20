@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted (amended)
+Accepted (updated)
 
 ## Date
 
@@ -34,8 +34,12 @@ The Go server acts as a **backend proxy** for ProPresenter API requests using pu
 | `POST /message/send` (`{"name":"Paul"}`) | `POST http://<PP_HOST>:<PP_PORT>/v1/message/<MESSAGE_NAME>/trigger` |
 | `POST /message/clear` | `GET http://<PP_HOST>:<PP_PORT>/v1/message/<MESSAGE_NAME>/clear` |
 | `GET /message/test` | `GET http://<PP_HOST>:<PP_PORT>/v1/messages` |
+| `GET /message/config` | Returns server config (e.g., `autoClearSeconds`) as JSON — no ProPresenter call |
+| `GET /version` | Returns build version info as JSON — no ProPresenter call, no auth required |
 
 The PWA sends only the child's name; the server resolves the ProPresenter message template name from the `MESSAGE_NAME` environment variable. All other paths serve static PWA files.
+
+**Note**: `POST /message/clear` exists for the server-side auto-clear feature. The PWA does not expose a manual clear button to the user (see ADR-003).
 
 ### Implementation
 

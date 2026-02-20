@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Accepted (updated)
 
 ## Date
 
@@ -34,8 +34,9 @@ Use a **random bearer token** embedded in the QR code URL. The QR code is the "k
 
 | Path | Protected | Reason |
 |------|-----------|--------|
-| `/api/*` | Yes | ProPresenter proxy — must not be publicly accessible |
+| `/message/*` | Yes | ProPresenter proxy — must not be publicly accessible |
 | `/children` | Yes | Children data — read and write |
+| `/version` | No | Build version info — non-sensitive, needed before auth |
 | `/` (static files) | No | PWA shell must load so the JS can extract the token |
 
 ### Token Comparison
@@ -55,3 +56,9 @@ Uses `crypto/subtle.ConstantTimeCompare` to prevent timing attacks.
 - **Random token by default**: each restart generates a new token, requiring a new QR code scan. Set `AUTH_TOKEN` for persistence.
 - **Hash fragment security**: the token in `#token=...` is never sent to the server in HTTP requests (only via `Authorization` header), and is not logged by proxies.
 - **Static files unprotected**: the PWA HTML/JS/CSS loads without auth. This is necessary so the JavaScript can parse the token from the URL hash. The static files contain no sensitive data.
+
+### PWA Auth Error Handling
+
+- **No token on load**: if the PWA loads without a token (no `#token=` in URL and nothing in `localStorage`), a full-screen error overlay is shown with a lock icon and the message "Nicht autorisiert — Bitte scanne den QR-Code erneut". All buttons and features are completely blocked; no event listeners are registered, no API calls are made.
+- **401 response handling**: all authenticated API calls go through an `authFetch()` wrapper. If any response returns HTTP 401, the wrapper immediately clears the token from `localStorage` and reloads the page. After reload, the missing token triggers the auth error overlay described above. This handles scenarios where the server restarts with a new random token.
+- **No partial degradation**: the PWA is fully functional or fully locked. There is no intermediate state where some features work without auth.

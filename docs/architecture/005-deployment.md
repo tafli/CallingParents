@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Accepted (updated)
 
 ## Date
 
@@ -32,6 +32,29 @@ Go supports cross-compilation natively via `GOOS` and `GOARCH` environment varia
 |--------|--------|
 | Linux amd64 | `dist/calling_parents-linux-amd64` |
 | Windows amd64 | `dist/calling_parents-windows-amd64.exe` |
+
+### Versioning
+
+Version information is injected at build time via Go's `-ldflags` mechanism. The `build.sh` script automatically reads:
+
+- **Version**: from `git describe --tags --always --dirty` (e.g., `v1.0.0`, `v1.0.0-3-gabc1234`, or `abc1234-dirty`)
+- **Commit**: short Git SHA from `git rev-parse --short HEAD`
+- **Date**: UTC build timestamp
+
+These values are injected into `internal/version/` package variables:
+
+```
+go build -ldflags "-X .../version.Version=v1.0.0 -X .../version.Commit=abc1234 -X .../version.Date=2026-02-20T12:00:00Z"
+```
+
+All three can be overridden via environment variables (`VERSION`, `COMMIT`, `DATE`) for CI builds.
+
+Version is:
+- **Logged at startup**: `calling-parents v1.0.0 (abc1234) built 2026-02-20T12:00:00Z`
+- **Exposed via `/version` endpoint**: returns JSON `{"version":"...","commit":"...","date":"..."}` (unauthenticated)
+- **Displayed in the PWA**: shown in the settings view footer; full details (commit, date) in a tooltip
+
+Without Git tags, the version defaults to the commit hash. Without ldflags (e.g., `go run`), it shows `dev (unknown)`.
 
 ### Configuration
 

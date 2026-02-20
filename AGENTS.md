@@ -6,6 +6,8 @@ This file provides instructions for AI coding agents working on the calling-pare
 
 All architecture decisions are recorded as ADRs in `docs/architecture/`. **Always read the relevant ADRs before making changes.** Any change that affects architecture, API design, authentication, configuration, deployment, or observability must conform to the existing ADRs. If a change contradicts an existing ADR, update the ADR first before implementing.
 
+**When implementing new features or changes, always update the affected ADRs in the same changeset.** This includes new endpoints, UI behavior changes, configuration additions, authentication changes, and deployment updates. ADRs must stay in sync with the code at all times.
+
 | ADR | Title                        |
 |-----|------------------------------|
 | [001](docs/architecture/001-project-overview.md) | Project Overview |

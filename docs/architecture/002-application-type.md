@@ -43,3 +43,13 @@ Build a **Progressive Web App (PWA)**.
 - The app cannot use raw TCP sockets from the browser; it must use the HTTP API (this is fine — ProPresenter exposes both TCP and HTTP on the same port).
 - A Go server is needed to serve the PWA files and proxy API requests (see ADR-006).
 - The app depends on Chrome (or another modern browser) being installed on the Android phone.
+
+### PWA UI Design Decisions
+
+- **No manual clear button**: the ProPresenter operator is responsible for clearing messages from the audience screen. The PWA only sends messages. Server-side auto-clear (if configured) handles automatic removal after a timeout.
+- **Auth error screen**: if the PWA loads without an authentication token (no QR code scanned), a full-screen overlay blocks all interaction and instructs the user to scan the QR code. No buttons or features are accessible without a valid token.
+- **401 handling**: if any API call returns HTTP 401, the PWA clears the stored token and reloads the page, showing the auth error screen. This handles token expiry on server restart.
+- **Input clear button**: the name input field includes an inline `×` button to quickly clear entered text, visible only when the field is non-empty.
+- **Version display**: the settings view shows the application version in a footer, fetched from the unauthenticated `/version` endpoint. Full version details (commit, build date) are shown as a tooltip.
+- **Connection status dot**: the header shows a colored dot indicating ProPresenter connectivity, polled every 30 seconds.
+- **Toast notifications**: brief feedback messages appear for send/clear results and errors, auto-dismissing after 3 seconds.

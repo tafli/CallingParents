@@ -75,3 +75,4 @@ GET /v1/message/{id}/clear
 - The message template name is configured on the **server** via the `MESSAGE_NAME` environment variable (default `Eltern rufen`). The PWA does not need to know this value.
 - ProPresenter's API has **no authentication**; security relies on the local network being trusted.
 - If the message template is deleted or renamed in ProPresenter, the app must be reconfigured.
+- **The PWA does not expose a manual clear button.** Clearing the on-screen message is the ProPresenter operator's responsibility. The server still provides a `POST /message/clear` endpoint, which is used by the optional auto-clear timer (see ADR-006) but is not accessible to the user through the PWA interface.

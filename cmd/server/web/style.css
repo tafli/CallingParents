@@ -169,13 +169,42 @@ header h1 {
 
 .input-section input {
     width: 100%;
-    padding: 12px;
+    padding: 12px 36px 12px 12px;
     font-size: 1.1rem;
     border: 2px solid var(--color-border);
     border-radius: var(--radius);
     margin-bottom: 10px;
     outline: none;
     transition: border-color 0.2s;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-clear-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(calc(-50% - 5px));
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    color: var(--color-text-light);
+    cursor: pointer;
+    padding: 4px 6px;
+    line-height: 1;
+    border-radius: 50%;
+    transition: color 0.2s, background 0.2s;
+}
+
+.input-clear-btn:hover {
+    color: var(--color-text);
+    background: var(--color-border);
+}
+
+.input-clear-btn.hidden {
+    display: none;
 }
 
 .input-section input:focus {

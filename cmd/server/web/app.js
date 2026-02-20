@@ -65,6 +65,7 @@ const btnReloadChildren = document.getElementById("btn-reload-children");
 const toast = document.getElementById("toast");
 const headerTitle = document.getElementById("header-title");
 const statusDot = document.getElementById("status-dot");
+const btnClearInput = document.getElementById("btn-clear-input");
 
 // === Initialization ===
 function init() {
@@ -101,6 +102,11 @@ function init() {
     btnAddChild.addEventListener("click", addChild);
     btnReloadChildren.addEventListener("click", reloadChildren);
     inputName.addEventListener("input", onNameInput);
+    btnClearInput.addEventListener("click", () => {
+        inputName.value = "";
+        onNameInput();
+        inputName.focus();
+    });
     inputName.addEventListener("keydown", (e) => {
         if (e.key === "Enter" && inputName.value.trim()) sendMessage();
     });
@@ -220,7 +226,9 @@ function selectChild(name) {
 }
 
 function onNameInput() {
-    btnSend.disabled = !inputName.value.trim();
+    const hasText = !!inputName.value.trim();
+    btnSend.disabled = !hasText;
+    btnClearInput.classList.toggle("hidden", !hasText);
 
     // Update button highlights based on current input
     const currentName = inputName.value.trim();
