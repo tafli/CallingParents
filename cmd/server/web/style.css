@@ -42,6 +42,11 @@ header {
     top: 0;
     z-index: 100;
     box-shadow: var(--shadow);
+    transition: background 0.4s;
+}
+
+header.disconnected {
+    background: #e8710a;
 }
 
 header h1 {
@@ -73,6 +78,27 @@ header h1 {
 .status-dot.disconnected {
     background: #d93025;
     box-shadow: 0 0 4px #d93025;
+}
+
+/* === Connection Warning Banner === */
+.connection-banner {
+    background: #fef3e0;
+    color: #e65100;
+    text-align: center;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-bottom: 1px solid #ffcc02;
+}
+
+.connection-banner.hidden {
+    display: none;
+}
+
+/* === Disconnected Grid State === */
+.children-grid.disabled {
+    opacity: 0.4;
+    pointer-events: none;
 }
 
 .icon-btn {

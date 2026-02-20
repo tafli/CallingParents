@@ -10,6 +10,7 @@ let autoClearSeconds = 0;
 let autoClearTimer = null;
 let countdownTimer = null;
 let countdownRemaining = 0;
+let isConnected = false;
 
 // === Auth Token ===
 // Extract token from URL hash fragment (#token=...) and persist in localStorage.
@@ -227,7 +228,7 @@ function selectChild(name) {
 
 function onNameInput() {
     const hasText = !!inputName.value.trim();
-    btnSend.disabled = !hasText;
+    btnSend.disabled = !hasText || !isConnected;
     btnClearInput.classList.toggle("hidden", !hasText);
 
     // Update button highlights based on current input
@@ -425,20 +426,45 @@ async function fetchConfig() {
 }
 
 // === Connection Status Polling ===
+function setConnectionState(connected) {
+    const changed = isConnected !== connected;
+    isConnected = connected;
+
+    // Status dot
+    statusDot.className = connected ? "status-dot connected" : "status-dot disconnected";
+    statusDot.title = connected ? "ProPresenter verbunden" : "ProPresenter nicht erreichbar";
+
+    // Header color
+    const header = document.querySelector("header");
+    header.classList.toggle("disconnected", !connected);
+
+    // Warning banner
+    const banner = document.getElementById("connection-banner");
+    banner.classList.toggle("hidden", connected);
+
+    // Dim children grid
+    childrenGrid.classList.toggle("disabled", !connected);
+
+    // Update Send button state
+    onNameInput();
+
+    // Theme color meta tag
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = connected ? "#1a73e8" : "#e8710a";
+}
+
 async function checkConnection() {
     try {
         const resp = await authFetch("/message/test", {
             headers: authHeaders(),
         });
         if (resp.ok) {
-            statusDot.className = "status-dot connected";
-            statusDot.title = "ProPresenter verbunden";
+            setConnectionState(true);
         } else {
             throw new Error();
         }
     } catch (_) {
-        statusDot.className = "status-dot disconnected";
-        statusDot.title = "ProPresenter nicht erreichbar";
+        setConnectionState(false);
     }
 }
 

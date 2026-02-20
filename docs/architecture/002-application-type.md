@@ -51,5 +51,6 @@ Build a **Progressive Web App (PWA)**.
 - **401 handling**: if any API call returns HTTP 401, the PWA clears the stored token and reloads the page, showing the auth error screen. This handles token expiry on server restart.
 - **Input clear button**: the name input field includes an inline `×` button to quickly clear entered text, visible only when the field is non-empty.
 - **Version display**: the settings view shows the application version in a footer, fetched from the unauthenticated `/version` endpoint. Full version details (commit, build date) are shown as a tooltip.
-- **Connection status dot**: the header shows a colored dot indicating ProPresenter connectivity, polled every 30 seconds.
+- **Connection status dot**: the header shows a colored dot indicating ProPresenter connectivity, polled every 10 seconds.
+- **Disconnected state UX**: when ProPresenter is unreachable, the PWA provides clear visual feedback through four mechanisms: (1) the Send button is disabled so users cannot attempt futile sends, (2) a warning banner appears below the header reading "⚠ ProPresenter nicht erreichbar", (3) the children name grid is dimmed and non-interactive, and (4) the header background changes from blue to orange. All four indicators revert automatically when connectivity is restored. The theme-color meta tag also updates so the browser chrome reflects the connection state.
 - **Toast notifications**: brief feedback messages appear for send/clear results and errors, auto-dismissing after 3 seconds.
