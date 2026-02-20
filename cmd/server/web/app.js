@@ -92,7 +92,7 @@ function init() {
 
     // Start connection status polling
     checkConnection();
-    setInterval(checkConnection, 30000);
+    setInterval(checkConnection, 10000);
 
     // Event listeners
     btnSettings.addEventListener("click", showSettings);
