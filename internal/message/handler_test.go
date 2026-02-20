@@ -21,7 +21,7 @@ func TestHandleSendSuccess(t *testing.T) {
 	}))
 	defer pp.Close()
 
-	h := New(pp.URL, "Eltern rufen")
+	h := New(pp.URL, "Eltern rufen", 0)
 
 	body := strings.NewReader(`{"name":"Paul"}`)
 	req := httptest.NewRequest(http.MethodPost, "/message/send", body)
@@ -47,7 +47,7 @@ func TestHandleSendSuccess(t *testing.T) {
 func TestHandleSendEmptyName(t *testing.T) {
 	t.Parallel()
 
-	h := New("http://localhost:1", "Eltern rufen")
+	h := New("http://localhost:1", "Eltern rufen", 0)
 
 	body := strings.NewReader(`{"name":"  "}`)
 	req := httptest.NewRequest(http.MethodPost, "/message/send", body)
@@ -64,7 +64,7 @@ func TestHandleSendEmptyName(t *testing.T) {
 func TestHandleSendRejectsGet(t *testing.T) {
 	t.Parallel()
 
-	h := New("http://localhost:1", "Eltern rufen")
+	h := New("http://localhost:1", "Eltern rufen", 0)
 
 	req := httptest.NewRequest(http.MethodGet, "/message/send", nil)
 	rec := httptest.NewRecorder()
@@ -79,7 +79,7 @@ func TestHandleSendRejectsGet(t *testing.T) {
 func TestHandleSendProPresenterDown(t *testing.T) {
 	t.Parallel()
 
-	h := New("http://127.0.0.1:1", "Eltern rufen")
+	h := New("http://127.0.0.1:1", "Eltern rufen", 0)
 
 	body := strings.NewReader(`{"name":"Paul"}`)
 	req := httptest.NewRequest(http.MethodPost, "/message/send", body)
@@ -103,7 +103,7 @@ func TestHandleClearSuccess(t *testing.T) {
 	}))
 	defer pp.Close()
 
-	h := New(pp.URL, "Eltern rufen")
+	h := New(pp.URL, "Eltern rufen", 0)
 
 	req := httptest.NewRequest(http.MethodPost, "/message/clear", nil)
 	rec := httptest.NewRecorder()
@@ -123,7 +123,7 @@ func TestHandleClearSuccess(t *testing.T) {
 func TestHandleClearRejectsGet(t *testing.T) {
 	t.Parallel()
 
-	h := New("http://localhost:1", "Eltern rufen")
+	h := New("http://localhost:1", "Eltern rufen", 0)
 
 	req := httptest.NewRequest(http.MethodGet, "/message/clear", nil)
 	rec := httptest.NewRecorder()
@@ -146,7 +146,7 @@ func TestHandleTestSuccess(t *testing.T) {
 	}))
 	defer pp.Close()
 
-	h := New(pp.URL, "Eltern rufen")
+	h := New(pp.URL, "Eltern rufen", 0)
 
 	req := httptest.NewRequest(http.MethodGet, "/message/test", nil)
 	rec := httptest.NewRecorder()
@@ -166,7 +166,7 @@ func TestHandleTestSuccess(t *testing.T) {
 func TestHandleTestProPresenterDown(t *testing.T) {
 	t.Parallel()
 
-	h := New("http://127.0.0.1:1", "Eltern rufen")
+	h := New("http://127.0.0.1:1", "Eltern rufen", 0)
 
 	req := httptest.NewRequest(http.MethodGet, "/message/test", nil)
 	rec := httptest.NewRecorder()
@@ -195,5 +195,62 @@ func TestEscapeJSON(t *testing.T) {
 		if got != tc.expected {
 			t.Errorf("escapeJSON(%q) = %q, want %q", tc.input, got, tc.expected)
 		}
+	}
+}
+
+func TestHandleConfigReturnsAutoClear(t *testing.T) {
+	t.Parallel()
+
+	h := New("http://localhost:1", "Eltern rufen", 45)
+
+	req := httptest.NewRequest(http.MethodGet, "/message/config", nil)
+	rec := httptest.NewRecorder()
+
+	h.HandleConfig(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("expected 200, got %d", rec.Code)
+	}
+
+	var cfg configResponse
+	if err := json.NewDecoder(rec.Body).Decode(&cfg); err != nil {
+		t.Fatalf("failed to decode config response: %v", err)
+	}
+	if cfg.AutoClearSeconds != 45 {
+		t.Errorf("expected autoClearSeconds=45, got %d", cfg.AutoClearSeconds)
+	}
+}
+
+func TestHandleConfigDisabled(t *testing.T) {
+	t.Parallel()
+
+	h := New("http://localhost:1", "Eltern rufen", 0)
+
+	req := httptest.NewRequest(http.MethodGet, "/message/config", nil)
+	rec := httptest.NewRecorder()
+
+	h.HandleConfig(rec, req)
+
+	var cfg configResponse
+	if err := json.NewDecoder(rec.Body).Decode(&cfg); err != nil {
+		t.Fatalf("failed to decode config response: %v", err)
+	}
+	if cfg.AutoClearSeconds != 0 {
+		t.Errorf("expected autoClearSeconds=0, got %d", cfg.AutoClearSeconds)
+	}
+}
+
+func TestHandleConfigRejectsPost(t *testing.T) {
+	t.Parallel()
+
+	h := New("http://localhost:1", "Eltern rufen", 30)
+
+	req := httptest.NewRequest(http.MethodPost, "/message/config", nil)
+	rec := httptest.NewRecorder()
+
+	h.HandleConfig(rec, req)
+
+	if rec.Code != http.StatusMethodNotAllowed {
+		t.Errorf("expected 405, got %d", rec.Code)
 	}
 }

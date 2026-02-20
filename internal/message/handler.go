@@ -13,18 +13,20 @@ import (
 // Handler provides HTTP endpoints that proxy message operations to ProPresenter.
 // The PWA sends only a child's name; the handler knows the message template.
 type Handler struct {
-	proPresenterURL string
-	messageName     string
-	client          *http.Client
+	proPresenterURL  string
+	messageName      string
+	autoClearSeconds int
+	client           *http.Client
 }
 
 // New creates a Handler that talks to ProPresenter at the given base URL
 // using the given message template name.
-func New(proPresenterURL, messageName string) *Handler {
+func New(proPresenterURL, messageName string, autoClearSeconds int) *Handler {
 	return &Handler{
-		proPresenterURL: strings.TrimRight(proPresenterURL, "/"),
-		messageName:     messageName,
-		client:          &http.Client{Timeout: 10 * time.Second},
+		proPresenterURL:  strings.TrimRight(proPresenterURL, "/"),
+		messageName:      messageName,
+		autoClearSeconds: autoClearSeconds,
+		client:           &http.Client{Timeout: 10 * time.Second},
 	}
 }
 
@@ -162,4 +164,21 @@ func escapeJSON(s string) string {
 	b, _ := json.Marshal(s)
 	// json.Marshal wraps in quotes: "value" — strip them.
 	return string(b[1 : len(b)-1])
+}
+
+// configResponse is the JSON body returned by HandleConfig.
+type configResponse struct {
+	AutoClearSeconds int `json:"autoClearSeconds"`
+}
+
+// HandleConfig returns client-relevant configuration as JSON.
+func (h *Handler) HandleConfig(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(configResponse{
+		AutoClearSeconds: h.autoClearSeconds,
+	})
 }

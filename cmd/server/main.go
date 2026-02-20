@@ -38,6 +38,11 @@ func main() {
 
 	log.Printf("ProPresenter API: %s", cfg.ProPresenterURL())
 	log.Printf("Message template: %s", cfg.MessageName)
+	if cfg.AutoClearSeconds > 0 {
+		log.Printf("Auto-clear after %d seconds", cfg.AutoClearSeconds)
+	} else {
+		log.Println("Auto-clear disabled")
+	}
 	log.Printf("Listening on %s", cfg.ListenAddr)
 
 	fmt.Println()
@@ -66,10 +71,11 @@ func main() {
 	mux.Handle("/children", childStore)
 
 	// Message endpoints: send, clear, test connection
-	msgHandler := message.New(cfg.ProPresenterURL(), cfg.MessageName)
+	msgHandler := message.New(cfg.ProPresenterURL(), cfg.MessageName, cfg.AutoClearSeconds)
 	mux.HandleFunc("/message/send", msgHandler.HandleSend)
 	mux.HandleFunc("/message/clear", msgHandler.HandleClear)
 	mux.HandleFunc("/message/test", msgHandler.HandleTest)
+	mux.HandleFunc("/message/config", msgHandler.HandleConfig)
 
 	// Static PWA files
 	webContent, err := fs.Sub(webFS, "web")

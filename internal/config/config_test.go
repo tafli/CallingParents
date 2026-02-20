@@ -13,6 +13,7 @@ func TestLoadDefaults(t *testing.T) {
 	os.Unsetenv("CHILDREN_FILE")
 	os.Unsetenv("AUTH_TOKEN")
 	os.Unsetenv("MESSAGE_NAME")
+	os.Unsetenv("AUTO_CLEAR_SECONDS")
 
 	cfg := Load()
 
@@ -34,6 +35,9 @@ func TestLoadDefaults(t *testing.T) {
 	if cfg.MessageName != "Eltern rufen" {
 		t.Errorf("expected MessageName=Eltern rufen, got %s", cfg.MessageName)
 	}
+	if cfg.AutoClearSeconds != 30 {
+		t.Errorf("expected AutoClearSeconds=30, got %d", cfg.AutoClearSeconds)
+	}
 }
 
 func TestLoadFromEnv(t *testing.T) {
@@ -42,12 +46,14 @@ func TestLoadFromEnv(t *testing.T) {
 	os.Setenv("LISTEN_ADDR", ":3000")
 	os.Setenv("AUTH_TOKEN", "my-secret-token")
 	os.Setenv("MESSAGE_NAME", "Custom Message")
+	os.Setenv("AUTO_CLEAR_SECONDS", "60")
 	defer func() {
 		os.Unsetenv("PROPRESENTER_HOST")
 		os.Unsetenv("PROPRESENTER_PORT")
 		os.Unsetenv("LISTEN_ADDR")
 		os.Unsetenv("AUTH_TOKEN")
 		os.Unsetenv("MESSAGE_NAME")
+		os.Unsetenv("AUTO_CLEAR_SECONDS")
 	}()
 
 	cfg := Load()
@@ -66,6 +72,9 @@ func TestLoadFromEnv(t *testing.T) {
 	}
 	if cfg.MessageName != "Custom Message" {
 		t.Errorf("expected MessageName=Custom Message, got %s", cfg.MessageName)
+	}
+	if cfg.AutoClearSeconds != 60 {
+		t.Errorf("expected AutoClearSeconds=60, got %d", cfg.AutoClearSeconds)
 	}
 }
 

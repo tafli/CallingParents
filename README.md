@@ -75,6 +75,7 @@ run.bat
 | `LISTEN_ADDR` | `:8080` | Server listen address |
 | `CHILDREN_FILE` | `children.json` | Path to children names JSON file |
 | `MESSAGE_NAME` | `Eltern rufen` | ProPresenter message template name |
+| `AUTO_CLEAR_SECONDS` | `30` | Auto-clear message after N seconds (0 = disabled) |
 
 ## Usage
 

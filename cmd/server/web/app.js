@@ -6,6 +6,10 @@ const STORAGE_TOKEN = "calling_parents_token";
 let children = [];
 let activeMessage = false;
 let authToken = "";
+let autoClearSeconds = 0;
+let autoClearTimer = null;
+let countdownTimer = null;
+let countdownRemaining = 0;
 
 // === Auth Token ===
 // Extract token from URL hash fragment (#token=...) and persist in localStorage.
@@ -48,6 +52,7 @@ const childrenList = document.getElementById("children-list");
 const btnReloadChildren = document.getElementById("btn-reload-children");
 const toast = document.getElementById("toast");
 const headerTitle = document.getElementById("header-title");
+const statusDot = document.getElementById("status-dot");
 
 // === Initialization ===
 function init() {
@@ -58,6 +63,13 @@ function init() {
 
     // Fetch server-side children list, then merge
     fetchServerChildren();
+
+    // Fetch server config (auto-clear timer)
+    fetchConfig();
+
+    // Start connection status polling
+    checkConnection();
+    setInterval(checkConnection, 30000);
 
     // Event listeners
     btnSettings.addEventListener("click", showSettings);
@@ -279,7 +291,13 @@ async function sendMessage() {
 
         activeMessage = true;
         showStatus(`Anzeige: "Eltern von ${name}"`, "active");
-        showToast("Nachricht gesendet", "success");
+        showToast(`Nachricht gesendet: ${name} ✓`, "success");
+
+        // Haptic feedback
+        if (navigator.vibrate) navigator.vibrate(100);
+
+        // Start auto-clear countdown
+        startAutoClear();
     } catch (err) {
         showToast(`Fehler: ${err.message}`, "error");
         showStatus("Senden fehlgeschlagen", "error");
@@ -301,6 +319,7 @@ async function clearMessage() {
 
         activeMessage = false;
         hideStatus();
+        stopAutoClear();
         showToast("Nachricht gelöscht", "success");
 
         // Reset selection
@@ -333,7 +352,10 @@ async function testConnection() {
 
 // === Status Bar ===
 function showStatus(text, type) {
-    statusBar.textContent = text;
+    statusBar.textContent = "";
+    const span = document.createElement("span");
+    span.textContent = text;
+    statusBar.appendChild(span);
     statusBar.className = `status-bar ${type}`;
     statusBar.classList.remove("hidden");
 }
@@ -355,6 +377,99 @@ function showToast(message, type) {
     toastTimeout = setTimeout(() => {
         toast.classList.add("hidden");
     }, 3000);
+}
+
+// === Server Config ===
+async function fetchConfig() {
+    try {
+        const resp = await fetch("/message/config", {
+            headers: authHeaders(),
+        });
+        if (!resp.ok) return;
+        const cfg = await resp.json();
+        if (typeof cfg.autoClearSeconds === "number") {
+            autoClearSeconds = cfg.autoClearSeconds;
+        }
+    } catch (_) {
+        // Use defaults if server unreachable
+    }
+}
+
+// === Connection Status Polling ===
+async function checkConnection() {
+    try {
+        const resp = await fetch("/message/test", {
+            headers: authHeaders(),
+        });
+        if (resp.ok) {
+            statusDot.className = "status-dot connected";
+            statusDot.title = "ProPresenter verbunden";
+        } else {
+            throw new Error();
+        }
+    } catch (_) {
+        statusDot.className = "status-dot disconnected";
+        statusDot.title = "ProPresenter nicht erreichbar";
+    }
+}
+
+// === Auto-Clear Timer ===
+function startAutoClear() {
+    stopAutoClear();
+    if (autoClearSeconds <= 0) return;
+
+    countdownRemaining = autoClearSeconds;
+    updateCountdownDisplay();
+
+    countdownTimer = setInterval(() => {
+        countdownRemaining--;
+        if (countdownRemaining <= 0) {
+            autoClearExpired();
+        } else {
+            updateCountdownDisplay();
+        }
+    }, 1000);
+}
+
+function stopAutoClear() {
+    if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+    }
+    // Remove countdown element if present
+    const cd = statusBar.querySelector(".countdown");
+    if (cd) cd.remove();
+}
+
+function updateCountdownDisplay() {
+    let cd = statusBar.querySelector(".countdown");
+    if (!cd) {
+        cd = document.createElement("span");
+        cd.className = "countdown";
+        statusBar.appendChild(cd);
+    }
+    cd.textContent = `${countdownRemaining}s`;
+}
+
+async function autoClearExpired() {
+    stopAutoClear();
+    // Auto-clear the message
+    try {
+        const resp = await fetch("/message/clear", {
+            method: "POST",
+            headers: authHeaders(),
+        });
+        if (!resp.ok && resp.status !== 204) {
+            throw new Error(`HTTP ${resp.status}`);
+        }
+        activeMessage = false;
+        hideStatus();
+        showToast("Nachricht automatisch gelöscht", "success");
+        inputName.value = "";
+        onNameInput();
+    } catch (err) {
+        showToast(`Auto-Löschen fehlgeschlagen: ${err.message}`, "error");
+    }
 }
 
 // === Service Worker Registration ===

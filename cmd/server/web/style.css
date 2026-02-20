@@ -49,6 +49,32 @@ header h1 {
     font-weight: 600;
 }
 
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* === Status Dot (connection indicator) === */
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #9aa0a6;
+    flex-shrink: 0;
+    transition: background 0.3s;
+}
+
+.status-dot.connected {
+    background: #34d058;
+    box-shadow: 0 0 4px #34d058;
+}
+
+.status-dot.disconnected {
+    background: #d93025;
+    box-shadow: 0 0 4px #d93025;
+}
+
 .icon-btn {
     background: none;
     border: none;
@@ -77,6 +103,16 @@ header h1 {
 .status-bar.active {
     background: var(--color-success);
     color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.status-bar .countdown {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    white-space: nowrap;
+    margin-left: 12px;
 }
 
 .status-bar.error {

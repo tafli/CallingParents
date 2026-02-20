@@ -1,6 +1,9 @@
 package config
 
-import "os"
+import (
+	"os"
+	"strconv"
+)
 
 // Config holds the application configuration.
 type Config struct {
@@ -17,6 +20,9 @@ type Config struct {
 	AuthToken string
 	// MessageName is the name of the ProPresenter message template to trigger.
 	MessageName string
+	// AutoClearSeconds is the number of seconds after which a sent message is
+	// automatically cleared. 0 disables auto-clear.
+	AutoClearSeconds int
 }
 
 // Load reads configuration from environment variables with sensible defaults.
@@ -28,6 +34,7 @@ func Load() Config {
 		ChildrenFile:     getEnv("CHILDREN_FILE", "children.json"),
 		AuthToken:        os.Getenv("AUTH_TOKEN"),
 		MessageName:      getEnv("MESSAGE_NAME", "Eltern rufen"),
+		AutoClearSeconds: getEnvInt("AUTO_CLEAR_SECONDS", 30),
 	}
 }
 
@@ -41,4 +48,16 @@ func getEnv(key, fallback string) string {
 		return v
 	}
 	return fallback
+}
+
+func getEnvInt(key string, fallback int) int {
+	v := os.Getenv(key)
+	if v == "" {
+		return fallback
+	}
+	i, err := strconv.Atoi(v)
+	if err != nil {
+		return fallback
+	}
+	return i
 }
