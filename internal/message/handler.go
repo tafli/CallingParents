@@ -71,13 +71,13 @@ func (h *Handler) HandleSend(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := h.client.Do(ppReq)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("ProPresenter unreachable: %v", err), http.StatusBadGateway)
+		http.Error(w, "ProPresenter ist nicht erreichbar", http.StatusServiceUnavailable)
 		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode >= 400 {
-		http.Error(w, fmt.Sprintf("ProPresenter error: %d", resp.StatusCode), http.StatusBadGateway)
+		http.Error(w, "ProPresenter hat die Nachricht abgelehnt", http.StatusServiceUnavailable)
 		return
 	}
 
@@ -105,13 +105,13 @@ func (h *Handler) HandleClear(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := h.client.Do(ppReq)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("ProPresenter unreachable: %v", err), http.StatusBadGateway)
+		http.Error(w, "ProPresenter ist nicht erreichbar", http.StatusServiceUnavailable)
 		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode >= 400 {
-		http.Error(w, fmt.Sprintf("ProPresenter error: %d", resp.StatusCode), http.StatusBadGateway)
+		http.Error(w, "ProPresenter konnte die Nachricht nicht löschen", http.StatusServiceUnavailable)
 		return
 	}
 
@@ -138,13 +138,13 @@ func (h *Handler) HandleTest(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := h.client.Do(ppReq)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("ProPresenter unreachable: %v", err), http.StatusBadGateway)
+		http.Error(w, "ProPresenter ist nicht erreichbar", http.StatusServiceUnavailable)
 		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode >= 400 {
-		http.Error(w, fmt.Sprintf("ProPresenter error: %d", resp.StatusCode), http.StatusBadGateway)
+		http.Error(w, "ProPresenter-Verbindung fehlgeschlagen", http.StatusServiceUnavailable)
 		return
 	}
 

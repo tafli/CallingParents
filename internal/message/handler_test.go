@@ -88,8 +88,8 @@ func TestHandleSendProPresenterDown(t *testing.T) {
 
 	h.HandleSend(rec, req)
 
-	if rec.Code != http.StatusBadGateway {
-		t.Errorf("expected 502 when PP is down, got %d", rec.Code)
+	if rec.Code != http.StatusServiceUnavailable {
+		t.Errorf("expected 503 when PP is down, got %d", rec.Code)
 	}
 }
 
@@ -173,8 +173,8 @@ func TestHandleTestProPresenterDown(t *testing.T) {
 
 	h.HandleTest(rec, req)
 
-	if rec.Code != http.StatusBadGateway {
-		t.Errorf("expected 502 when PP is down, got %d", rec.Code)
+	if rec.Code != http.StatusServiceUnavailable {
+		t.Errorf("expected 503 when PP is down, got %d", rec.Code)
 	}
 }
 
