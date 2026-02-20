@@ -30,11 +30,11 @@ When a child in the nursery or kids' area needs their parents, tap their name an
 ## How It Works
 
 ```
-┌──────────────┐          ┌──────────────────┐          ┌──────────────────┐
-│   Phone /    │  HTTP    │   Go Server      │  HTTP    │  ProPresenter    │
-│   Tablet     │ ──────▸  │   (reverse proxy) │ ──────▸  │  (Messages API)  │
-│   (PWA)      │          │   + embedded PWA  │          │  → Audience Screen│
-└──────────────┘          └──────────────────┘          └──────────────────┘
+┌──────────────┐          ┌───────────────────┐          ┌────────────────────┐
+│   Phone /    │  HTTP    │   Go Server       │  HTTP    │  ProPresenter      │
+│   Tablet     │ ──────▸  │   (reverse proxy) │ ──────▸  │  (Messages API)    │
+│   (PWA)      │          │   + embedded PWA  │          │  → Audience Screen │
+└──────────────┘          └───────────────────┘          └────────────────────┘
 ```
 
 1. The Go server embeds the PWA and proxies API requests to ProPresenter (solving CORS)
