@@ -42,7 +42,6 @@ const btnBack = document.getElementById("btn-back");
 const childrenGrid = document.getElementById("children-grid");
 const inputName = document.getElementById("input-name");
 const btnSend = document.getElementById("btn-send");
-const btnClear = document.getElementById("btn-clear");
 const statusBar = document.getElementById("status-bar");
 const btnTestConnection = document.getElementById("btn-test-connection");
 const connectionStatus = document.getElementById("connection-status");
@@ -85,7 +84,6 @@ function init() {
     btnSettings.addEventListener("click", showSettings);
     btnBack.addEventListener("click", showMain);
     btnSend.addEventListener("click", sendMessage);
-    btnClear.addEventListener("click", clearMessage);
     btnTestConnection.addEventListener("click", testConnection);
     btnAddChild.addEventListener("click", addChild);
     btnReloadChildren.addEventListener("click", reloadChildren);
