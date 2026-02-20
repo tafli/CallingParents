@@ -199,3 +199,7 @@ This project is licensed under the [MIT License](LICENSE).
 ## Contributing
 
 Contributions are welcome! Please read the architecture decision records in `docs/architecture/` before making changes. Any modification that affects architecture, API design, authentication, or deployment must conform to (or update) the relevant ADRs.
+
+## Built With
+
+This application was built entirely with [GitHub Copilot](https://github.com/features/copilot) (Claude Opus 4.6) — from architecture design and Go backend to the PWA frontend, service worker, and CI/CD pipeline.
