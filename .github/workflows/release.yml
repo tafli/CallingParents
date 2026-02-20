@@ -52,21 +52,28 @@ jobs:
           mkdir -p dist/
 
           echo "Building linux/amd64..."
-          GOOS=linux GOARCH=amd64 go build -ldflags "${LDFLAGS}" -o dist/calling_parents-linux-amd64 ./cmd/server
+          GOOS=linux GOARCH=amd64 go build -ldflags "${LDFLAGS}" -o dist/calling-parents-linux-amd64 ./cmd/server
 
           echo "Building windows/amd64..."
-          GOOS=windows GOARCH=amd64 go build -ldflags "${LDFLAGS}" -o dist/calling_parents-windows-amd64.exe ./cmd/server
+          GOOS=windows GOARCH=amd64 go build -ldflags "${LDFLAGS}" -o dist/calling-parents-windows-amd64.exe ./cmd/server
 
       - name: Prepare distribution files
         run: |
           cp config.toml.example dist/
           cp children.json.example dist/
+          cp run.sh dist/
           cp run.bat dist/
+
+      - name: Create archives
+        run: |
+          cd dist/
+          tar czf calling-parents-linux-amd64.tar.gz calling-parents-linux-amd64 config.toml.example children.json.example run.sh
+          zip -q calling-parents-windows-amd64.zip calling-parents-windows-amd64.exe config.toml.example children.json.example run.bat
 
       - name: Generate checksums
         run: |
           cd dist/
-          sha256sum calling_parents-linux-amd64 calling_parents-windows-amd64.exe > checksums.txt
+          sha256sum calling-parents-linux-amd64.tar.gz calling-parents-windows-amd64.zip > checksums.txt
           echo "Checksums:"
           cat checksums.txt
 
@@ -75,9 +82,6 @@ jobs:
         with:
           generate_release_notes: true
           files: |
-            dist/calling_parents-linux-amd64
-            dist/calling_parents-windows-amd64.exe
-            dist/config.toml.example
-            dist/children.json.example
-            dist/run.bat
+            dist/calling-parents-linux-amd64.tar.gz
+            dist/calling-parents-windows-amd64.zip
             dist/checksums.txt

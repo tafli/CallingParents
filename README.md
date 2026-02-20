@@ -64,12 +64,14 @@ When a child in the nursery or kids' area needs their parents, tap their name an
 ./build.sh
 ```
 
-Produces binaries in `dist/`:
+Produces archives in `dist/`:
 
 | File | Platform |
 |------|----------|
-| `dist/calling_parents-linux-amd64` | Linux |
-| `dist/calling_parents-windows-amd64.exe` | Windows |
+| `dist/calling-parents-linux-amd64.tar.gz` | Linux |
+| `dist/calling-parents-windows-amd64.zip` | Windows |
+
+Each archive contains the binary, `config.toml.example`, `children.json.example`, and a platform-appropriate run script.
 
 ### 2. Configure
 

@@ -30,18 +30,23 @@ rm -rf dist/
 mkdir -p dist/
 
 echo "==> Building linux/amd64..."
-GOOS=linux GOARCH=amd64 go build -ldflags "${LDFLAGS}" -o dist/calling_parents-linux-amd64 ./cmd/server
+GOOS=linux GOARCH=amd64 go build -ldflags "${LDFLAGS}" -o dist/calling-parents-linux-amd64 ./cmd/server
 
 echo "==> Building windows/amd64..."
-GOOS=windows GOARCH=amd64 go build -ldflags "${LDFLAGS}" -o dist/calling_parents-windows-amd64.exe ./cmd/server
+GOOS=windows GOARCH=amd64 go build -ldflags "${LDFLAGS}" -o dist/calling-parents-windows-amd64.exe ./cmd/server
 
 echo "==> Copying distribution files..."
 cp config.toml.example dist/
 cp children.json.example dist/
+cp run.sh dist/
 cp run.bat dist/
 
+echo "==> Creating archives..."
+(cd dist/ && tar czf calling-parents-linux-amd64.tar.gz calling-parents-linux-amd64 config.toml.example children.json.example run.sh)
+(cd dist/ && zip -q calling-parents-windows-amd64.zip calling-parents-windows-amd64.exe config.toml.example children.json.example run.bat)
+
 echo "==> Generating checksums..."
-(cd dist/ && sha256sum calling_parents-linux-amd64 calling_parents-windows-amd64.exe > checksums.txt)
+(cd dist/ && sha256sum calling-parents-linux-amd64.tar.gz calling-parents-windows-amd64.zip > checksums.txt)
 
 echo ""
 echo "==> Build complete:"

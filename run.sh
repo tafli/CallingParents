@@ -8,7 +8,7 @@ echo "==> Building for current platform..."
 gofmt -w .
 go vet ./...
 go test ./...
-go build -o calling_parents ./cmd/server
+go build -o calling-parents ./cmd/server
 
 echo "==> Starting server..."
-exec ./calling_parents
+exec ./calling-parents
