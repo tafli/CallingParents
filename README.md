@@ -8,7 +8,7 @@ When a child in the nursery or kids' area needs their parents, tap their name an
 
 ## Features
 
-- **One-tap parent calling** — select a child's name from a grid and send instantly
+- **One-tap parent calling** — select a child's name from a scrollable grid and send instantly
 - **ProPresenter integration** — triggers messages directly on audience screens via ProPresenter's HTTP API
 - **Progressive Web App (PWA)** — installable from the browser, works on any phone or tablet (Android, iOS, desktop)
 - **No app store required** — open a URL, tap "Add to Home Screen", done
@@ -16,6 +16,7 @@ When a child in the nursery or kids' area needs their parents, tap their name an
 - **Offline app shell** — the interface loads even when the server is momentarily unreachable
 - **Auto-clear timer** — messages automatically disappear after a configurable timeout
 - **Live connection status** — real-time indicator shows whether ProPresenter is reachable
+- **Fixed action bar** — input field and send button stay pinned at the bottom, visible regardless of list size
 - **Multi-language support** — German and English included, easily extensible (just add a JSON file)
 - **Single binary deployment** — one self-contained executable embeds everything, no dependencies to install
 - **Auto-upgrading config** — new configuration options are automatically appended to existing `config.toml` files on startup (with a `.bak` backup), so upgrades never break your setup
