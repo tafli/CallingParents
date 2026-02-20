@@ -56,7 +56,7 @@ When a child in the nursery or kids' area needs their parents, tap their name an
   - Name: `Eltern rufen` (or any name — set it in `MESSAGE_NAME`)
   - Template text containing a token named `Name` (e.g., `Eltern von {Name}` or `Parents of {Name}`)
   - The **Messages layer** enabled in the active Look for audience screen(s)
-- **Go 1.22+** for building from source (or use a pre-built binary from [Releases](https://github.com/tafli/calling-parents/releases))
+- **Go 1.22+** for building from source (or use a pre-built binary from [Releases](https://github.com/tafli/CallingParents/releases))
 
 ### 1. Build
 

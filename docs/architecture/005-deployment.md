@@ -104,7 +104,7 @@ A separate CI workflow (`.github/workflows/ci.yml`) runs on every push to `main`
 
 ### Deployment Steps (Windows)
 
-1. Download the latest release from [GitHub Releases](https://github.com/tafli/calling-parents/releases) (or run `./build.sh` locally).
+1. Download the latest release from [GitHub Releases](https://github.com/tafli/CallingParents/releases) (or run `./build.sh` locally).
 2. Copy `calling_parents-windows-amd64.exe` and `config.toml.example` to the ProPresenter Windows machine.
 3. Rename `config.toml.example` to `config.toml` and adjust values (typically `propresenter_host = "localhost"`).
 4. Optionally copy `run.bat` to the same directory for convenient startup.

@@ -45,9 +45,9 @@ jobs:
           DATE: ${{ steps.meta.outputs.date }}
         run: |
           LDFLAGS="-s -w"
-          LDFLAGS+=" -X github.com/tafli/calling-parents/internal/version.Version=${VERSION}"
-          LDFLAGS+=" -X github.com/tafli/calling-parents/internal/version.Commit=${COMMIT}"
-          LDFLAGS+=" -X github.com/tafli/calling-parents/internal/version.Date=${DATE}"
+          LDFLAGS+=" -X github.com/tafli/CallingParents/internal/version.Version=${VERSION}"
+          LDFLAGS+=" -X github.com/tafli/CallingParents/internal/version.Commit=${COMMIT}"
+          LDFLAGS+=" -X github.com/tafli/CallingParents/internal/version.Date=${DATE}"
 
           mkdir -p dist/
 

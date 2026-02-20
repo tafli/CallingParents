@@ -10,13 +10,13 @@ import (
 
 	qrterminal "github.com/mdp/qrterminal/v3"
 
-	"github.com/tafli/calling-parents/internal/activitylog"
-	"github.com/tafli/calling-parents/internal/auth"
-	"github.com/tafli/calling-parents/internal/children"
-	"github.com/tafli/calling-parents/internal/config"
-	"github.com/tafli/calling-parents/internal/message"
-	"github.com/tafli/calling-parents/internal/network"
-	"github.com/tafli/calling-parents/internal/version"
+	"github.com/tafli/CallingParents/internal/activitylog"
+	"github.com/tafli/CallingParents/internal/auth"
+	"github.com/tafli/CallingParents/internal/children"
+	"github.com/tafli/CallingParents/internal/config"
+	"github.com/tafli/CallingParents/internal/message"
+	"github.com/tafli/CallingParents/internal/network"
+	"github.com/tafli/CallingParents/internal/version"
 )
 
 //go:embed all:web

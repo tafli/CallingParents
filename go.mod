@@ -1,4 +1,4 @@
-module github.com/tafli/calling-parents
+module github.com/tafli/CallingParents
 
 go 1.25.0
 
